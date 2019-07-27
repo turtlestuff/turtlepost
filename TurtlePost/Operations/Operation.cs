@@ -6,6 +6,6 @@ namespace TurtlePost
 {
     public abstract class Operation
     {
-        public abstract void Operate(Stack<dynamic> stack);
+        public abstract void Operate(Stack<Object> stack);
     }
 }

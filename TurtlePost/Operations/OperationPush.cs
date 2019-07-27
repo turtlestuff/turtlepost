@@ -7,13 +7,13 @@ namespace TurtlePost.Operations
     class OperationPush : Operation
     {  
         public dynamic Object { get; }
-
-        public OperationPush(dynamic obj)
+        //peekaboo! this one is only used internally!
+        public OperationPush(Object obj)
         {
             Object = obj;
         }
 
-        public override void Operate(Stack<dynamic> stack)
+        public override void Operate(Stack<Object> stack)
         {
             stack.Push(Object);
         }

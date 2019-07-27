@@ -4,19 +4,20 @@ using System.Text;
 
 namespace TurtlePost.Operations
 {
-    class OperationAdd : Operation
+    class OperationSub : Operation
     {
-        OperationAdd()
+        OperationSub()
         {
         }
 
-        public static OperationAdd Instance { get; } = new OperationAdd();
+        public static OperationSub Instance { get; } = new OperationSub();
 
         public override void Operate(Stack<Object> stack)
         {
-            double v1 = (double)stack.Pop();
             double v2 = (double)stack.Pop();
-            stack.Push(v1 + v2);
+            double v1 = (double)stack.Pop();
+            stack.Push(v1 - v2);
+
         }
     }
 }

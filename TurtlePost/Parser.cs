@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using TurtlePost.Operations;
 
@@ -11,7 +12,8 @@ namespace TurtlePost
         readonly CharEnumerator enumerator;
         internal static Dictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
         {
-            { "add", OperationAdd.Instance }
+            { "add", OperationAdd.Instance },
+            { "sub", OperationSub.Instance }
         };
         readonly StringBuilder buffer = new StringBuilder();
 
@@ -22,46 +24,43 @@ namespace TurtlePost
 
        
 
-        public IEnumerable<Operation?> Do()
+        public Operation? Do()
         {
+            buffer.Clear();
             // Break on EOF
-            if (!enumerator.MoveNext()) yield break;
+            if (!enumerator.MoveNext()) return null;
 
             switch (enumerator.Current)
             {
                 case ' ':
                 case '\n':
                 case '\r':
-                    yield return OperationNone.Instance;
-                    break;
+                    return OperationNone.Instance;
                 case '"':
-                    yield return ParseString();
-                    break;
+                    return ParseString();
                 case '/': 
-                    yield return SkipComment();
-                    break;
+                    return SkipComment();
                 default:
-                    yield return ParseOperation();
-                    break;
+                    return ParseOperation();
             }
             
-            buffer.Clear();
+            
         }
 
-        Operation ParseOperation()
+        Operation? ParseOperation()
         {
             do
             {
                 buffer.Append(enumerator.Current);
-                enumerator.MoveNext();
+                if (!enumerator.MoveNext()) break;
             } while (enumerator.Current != ' ');
 
             string s = buffer.ToString();
 
-            if (!double.TryParse(s, out var num))
+            if (!double.TryParse(s,NumberStyles.Float,CultureInfo.InvariantCulture,out var num))
             {
                 return Operations.TryGetValue(s, out var op) ?
-                    op : throw new InvalidOperationException("Operation does not fucking exist.");
+                    op : throw new InvalidOperationException("Operation does not exist.");
             }
             else
             {
@@ -69,13 +68,13 @@ namespace TurtlePost
             }
         }
 
-        OperationPush ParseString()
+        OperationPush? ParseString()
         {
             enumerator.MoveNext();
             do
             {
                 buffer.Append(enumerator.Current);
-                enumerator.MoveNext();
+                if (!enumerator.MoveNext()) break;
             } while (enumerator.Current != '"');
 
             return new OperationPush(buffer.ToString());
@@ -85,8 +84,8 @@ namespace TurtlePost
         {
             enumerator.MoveNext();
             do 
-            { 
-                enumerator.MoveNext(); 
+            {
+                if (!enumerator.MoveNext()) break;
             } while (enumerator.Current != '/');
 
             return OperationNone.Instance;
