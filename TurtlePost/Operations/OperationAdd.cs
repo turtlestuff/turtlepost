@@ -6,6 +6,12 @@ namespace TurtlePost.Operations
 {
     class OperationAdd : Operation
     {
+        OperationAdd()
+        {
+        }
+
+        public static OperationAdd Instance { get; } = new OperationAdd();
+
         public override void Operate(Stack<dynamic> stack)
         {
             double v1 = stack.Pop();
