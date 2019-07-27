@@ -13,7 +13,7 @@ namespace TurtlePost.Operations
             Object = obj;
         }
 
-        public override void Operate(Stack<Object> stack)
+        public override void Operate(Stack<Object> stack, Dictionary<Global, Object> globals)
         {
             stack.Push(Object);
         }

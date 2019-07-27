@@ -12,7 +12,7 @@ namespace TurtlePost.Operations
 
         public static OperationNone Instance { get; } = new OperationNone();
 
-        public override void Operate(Stack<Object> stack)
+        public override void Operate(Stack<Object> stack, Dictionary<Global, Object> globals)
         {
         }
     }

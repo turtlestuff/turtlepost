@@ -12,7 +12,7 @@ namespace TurtlePost.Operations
 
         public static OperationSub Instance { get; } = new OperationSub();
 
-        public override void Operate(Stack<Object> stack)
+        public override void Operate(Stack<Object> stack, Dictionary<Global, Object> globals)
         {
             double v2 = (double)stack.Pop();
             double v1 = (double)stack.Pop();

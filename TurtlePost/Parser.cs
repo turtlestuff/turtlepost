@@ -10,12 +10,18 @@ namespace TurtlePost
     class Parser
     {
         readonly CharEnumerator enumerator;
+        
         internal static Dictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
         {
-            { "add", OperationAdd.Instance },
-            { "sub", OperationSub.Instance }
+            { "add",    OperationAdd.Instance },
+            { "sub",    OperationSub.Instance },
+            { "write",  OperationWrite.Instance },
+            { "push",   OperationPushVar.Instance }
         };
         readonly StringBuilder buffer = new StringBuilder();
+
+       
+
 
         public Parser(string code)
         {
@@ -36,6 +42,8 @@ namespace TurtlePost
                 case '\n':
                 case '\r':
                     return OperationNone.Instance;
+                case '&':
+                    return ParseGlobal();
                 case '"':
                     return ParseString();
                 case '/': 
@@ -47,7 +55,7 @@ namespace TurtlePost
             
         }
 
-        Operation? ParseOperation()
+        Operation ParseOperation()
         {
             do
             {
@@ -68,7 +76,7 @@ namespace TurtlePost
             }
         }
 
-        OperationPush? ParseString()
+        OperationPush ParseString()
         {
             enumerator.MoveNext();
             do
@@ -90,6 +98,35 @@ namespace TurtlePost
 
             return OperationNone.Instance;
         }
+
+        OperationPush ParseGlobal()
+        {
+            enumerator.MoveNext();
+
+            do
+            {
+                buffer.Append(enumerator.Current);
+                if (!enumerator.MoveNext()) break;
+            } while (enumerator.Current != ' ');
+
+            return new OperationPush(new Global(buffer.ToString()));
+
+        }
+
     }
+
+    public struct Global
+    {
+        public string name;
+        public Global(string gname)
+        {
+            name = gname;
+        }
+        public override string ToString()
+        {
+            return "Global (" + name + ")";
+        }
+    }
+
 }        
     
