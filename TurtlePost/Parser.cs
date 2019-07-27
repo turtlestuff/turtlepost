@@ -1,135 +1,128 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.Text;
 using TurtlePost.Operations;
 
 namespace TurtlePost
 {
-    class Parser
+    ref struct Parser
     {
-        readonly CharEnumerator enumerator;
+        readonly string code;
+        ReadOnlySpan<char>.Enumerator enumerator;
+        string range;
+        int location;
         
-        internal static Dictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
+        internal static ImmutableDictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
         {
-            //maths
-            { "add",    OperationAdd.Instance },
-            { "sub",    OperationSub.Instance },
-            { "mul",    OperationMul.Instance },
-            { "div",    OperationDiv.Instance },
-            //globals
-            { "write",  OperationWrite.Instance },
-            { "push",   OperationPushVar.Instance },
-            //i/o
-            { "println",OperationPrintLine.Instance },
-            { "print",  OperationPrint.Instance },
-            { "input",  OperationInput.Instance },
+            // maths
+            { "add",     AddOperation.Instance },
+            { "sub",     SubOperation.Instance },
+            { "mul",     MulOperation.Instance },
+            { "div",     DivOperation.Instance },
+            { "mod",     ModOperation.Instance },
             
-        };
-        readonly StringBuilder buffer = new StringBuilder();
+            // globals
+            { "write",   WriteOperation.Instance },
+            { "push",    PushOperation.Instance },
 
+            // i/o
+            { "println", PrintLineOperation.Instance },
+            { "print",   PrintOperation.Instance },
+            { "input",   InputOperation.Instance },
+            
+            // misc
+            { "exit",    ExitOperation.Instance },
+            { "nop",     NopOperation.Instance }
+        }.ToImmutableDictionary();
+        
         public Parser(string code)
         {
-            enumerator = code.GetEnumerator();
+            range = code;
+            location = -1;
+            this.code = code;
+            enumerator = code.AsSpan().GetEnumerator();
         }
 
-        public Operation? Do()
+        bool NextChar()
         {
-            buffer.Clear();
+            var moved = enumerator.MoveNext();
+            location++;
+
+            return moved;
+        }
+
+        public Operation? NextOperation()
+        {
             // Break on EOF
-            if (!enumerator.MoveNext()) return null;
+            if (!NextChar()) return null;
 
             switch (enumerator.Current)
             {
                 case ' ':
                 case '\n':
                 case '\r':
-                    return OperationNone.Instance;
+                    return NopOperation.Instance;
                 case '&':
                     return ParseGlobal();
                 case '"':
                     return ParseString();
                 case '/': 
                     return SkipComment();
+                case '.':
+                case char c when char.IsDigit(c):
+                    return ParseNumber();
                 default:
                     return ParseOperation();
             }
-            
-            
+        }
+
+        private Operation ParseNumber()
+        {
+            ReadUntil(' ');
+            return new PushObjectOperation(double.Parse(range, CultureInfo.InvariantCulture));
+        }
+
+        void ReadUntil(char c)
+        {
+            var start = location;
+            do
+            {
+                if (!NextChar()) break;
+            } while (enumerator.Current != c);
+
+            range = code[start..location];
         }
 
         Operation ParseOperation()
         {
-            do
-            {
-                buffer.Append(enumerator.Current);
-                if (!enumerator.MoveNext()) break;
-            } while (enumerator.Current != ' ');
+            ReadUntil(' ');
 
-            string s = buffer.ToString();
-
-            if (!double.TryParse(s,NumberStyles.Float,CultureInfo.InvariantCulture,out var num))
-            {
-                return Operations.TryGetValue(s, out var op) ?
-                    op : throw new InvalidOperationException("Operation does not exist.");
-            }
-            else
-            {
-                return new OperationPush(num);
-            }
+            return Operations[range];
         }
 
-        OperationPush ParseString()
+        PushObjectOperation ParseString()
         {
-            enumerator.MoveNext();
-            do
-            {
-                buffer.Append(enumerator.Current);
-                if (!enumerator.MoveNext()) break;
-            } while (enumerator.Current != '"');
-
-            return new OperationPush(buffer.ToString());
+            NextChar();
+            ReadUntil('"');
+            
+            return new PushObjectOperation(range);
         }
 
-        OperationNone SkipComment()
+        NopOperation SkipComment()
         {
-            enumerator.MoveNext();
-            do 
-            {
-                if (!enumerator.MoveNext()) break;
-            } while (enumerator.Current != '/');
-
-            return OperationNone.Instance;
+            NextChar();
+            ReadUntil('/');
+            return NopOperation.Instance;
         }
 
-        OperationPush ParseGlobal()
+        PushObjectOperation ParseGlobal()
         {
-            enumerator.MoveNext();
-
-            do
-            {
-                buffer.Append(enumerator.Current);
-                if (!enumerator.MoveNext()) break;
-            } while (enumerator.Current != ' ');
-
-            return new OperationPush(new Global(buffer.ToString()));
-
-        }
-
-    }
-
-    public struct Global
-    {
-        public string name;
-        public Global(string gname)
-        {
-            name = gname;
-        }
-        public override string ToString()
-        {
-            return "Global (" + name + ")";
+            NextChar();
+            ReadUntil(' ');
+            return new PushObjectOperation(new Global(range));
         }
     }
-
 }        
     

@@ -4,16 +4,17 @@ using System.Text;
 
 namespace TurtlePost.Operations
 {
-    class OperationPush : Operation
-    {  
-        public dynamic Object { get; }
+    class PushObjectOperation : Operation
+    {
+        public object Object { get; }
+
         //peekaboo! this one is only used internally!
-        public OperationPush(Object obj)
+        public PushObjectOperation(object obj)
         {
             Object = obj;
         }
 
-        public override void Operate(Stack<Object> stack, Dictionary<Global, Object> globals)
+        public override void Operate(Stack<object?> stack, GlobalBag _)
         {
             stack.Push(Object);
         }

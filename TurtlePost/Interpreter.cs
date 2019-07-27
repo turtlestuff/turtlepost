@@ -7,28 +7,32 @@ namespace TurtlePost
 {
     public class Interpreter
     {
-        readonly Stack<Object> userStack = new Stack<Object>();
+        readonly Stack<object?> userStack = new Stack<object?>();
         readonly Stack<int> programStack = new Stack<int>();
-        readonly Dictionary<Global, Object> globals = new Dictionary<Global, Object>();
+        readonly GlobalBag globals = new GlobalBag();
+
         public void Interpret(string code)
         {
-            Parser parser = new Parser(code);
-            while (true)
+            var parser = new Parser(code);
+            try
             {
-                Operation? op = parser.Do();
-                if(op == null){
-                    break;
-                }
-                else
+                while (true)
                 {
-                    op.Operate(userStack, globals); //since it is only a reference type, we are only
-                                           //passing a pointer over :)
+                    var op = parser.NextOperation();
+                    if (op == null) break;
+
+                    op.Operate(userStack, globals); // pass our globals to operator
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex);
+                Console.ResetColor();
             }
 #if DEBUG
             Utils.PrintStack(userStack, true);
 #endif
-
         }
     }
 }
