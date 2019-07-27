@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,22 +12,26 @@ namespace TurtlePost
         
         internal static Dictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
         {
+            //maths
             { "add",    OperationAdd.Instance },
             { "sub",    OperationSub.Instance },
+            { "mul",    OperationMul.Instance },
+            { "div",    OperationDiv.Instance },
+            //globals
             { "write",  OperationWrite.Instance },
-            { "push",   OperationPushVar.Instance }
+            { "push",   OperationPushVar.Instance },
+            //i/o
+            { "println",OperationPrintLine.Instance },
+            { "print",  OperationPrint.Instance },
+            { "input",  OperationInput.Instance },
+            
         };
         readonly StringBuilder buffer = new StringBuilder();
-
-       
-
 
         public Parser(string code)
         {
             enumerator = code.GetEnumerator();
         }
-
-       
 
         public Operation? Do()
         {

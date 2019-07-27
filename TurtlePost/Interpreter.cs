@@ -26,10 +26,7 @@ namespace TurtlePost
                 }
             }
 #if DEBUG
-            foreach(var i in userStack)
-            {
-                Console.Write(i + " | ");
-            }
+            Utils.PrintStack(userStack, true);
 #endif
 
         }

@@ -10,7 +10,7 @@ namespace TurtlePost.Operations
         {
         }
 
-        public static OperationAdd Instance { get; } = new OperationAdd();
+        public static OperationAdd Instance { get; } = new OperationAdd(); //this instance is used for the dictionary
 
         public override void Operate(Stack<Object> stack, Dictionary<Global, Object> globals)
         {
