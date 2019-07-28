@@ -1,17 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
 namespace TurtlePost
 {
-    public struct Global
+    public struct Label
     {
         public string Name { get; }
 
-        public Global(string name)
+        public Label(string name)
         {
             Name = name;
         }
 
         public override string ToString()
         {
-            return "Global(" + Name + ")";
+            return "Label(" + Name + ")";
         }
+
     }
 }

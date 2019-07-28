@@ -11,9 +11,8 @@ namespace TurtlePost
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("TurtlePost version 999999999.999999999999999 BEETA");
+            Console.WriteLine("TurtlePost Development");
             Console.WriteLine("By Vrabbers and Reflectronic, 2019");
-            Console.WriteLine("Type exit to exit");
             var directInterpreter = new Interpreter();
 
             while (true)

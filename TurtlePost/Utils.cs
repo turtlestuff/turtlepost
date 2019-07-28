@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace TurtlePost
 {
@@ -9,10 +8,11 @@ namespace TurtlePost
     {
         public static void PrintStack(Stack<object?> stack, bool colors)
         {
-            #pragma warning disable CS8619 // compiler bug
-            // Foreach with index
-            foreach (var (o, i) in stack.Select((o, i) => (o, i)))
+            //#pragma warning disable CS8619 no longer needed because we have a Normal for loop now
+            
+            for(int i = 0; i < stack.Count; i++)
             {
+                object? o = stack.ElementAt (i);
                 switch (o)
                 {
                     case string s:

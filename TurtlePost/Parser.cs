@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
-using System.Text;
 using TurtlePost.Operations;
 
 namespace TurtlePost
@@ -13,7 +12,6 @@ namespace TurtlePost
         ReadOnlySpan<char>.Enumerator enumerator;
         string range;
         int location;
-        
         internal static ImmutableDictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
         {
             // maths
@@ -43,6 +41,7 @@ namespace TurtlePost
             location = -1;
             this.code = code;
             enumerator = code.AsSpan().GetEnumerator();
+
         }
 
         bool NextChar()
@@ -73,15 +72,11 @@ namespace TurtlePost
                 case '.':
                 case char c when char.IsDigit(c):
                     return ParseNumber();
+                case '@':
+                    return ParseLabel();
                 default:
                     return ParseOperation();
             }
-        }
-
-        private Operation ParseNumber()
-        {
-            ReadUntil(' ');
-            return new PushObjectOperation(double.Parse(range, CultureInfo.InvariantCulture));
         }
 
         void ReadUntil(char c)
@@ -93,6 +88,12 @@ namespace TurtlePost
             } while (enumerator.Current != c);
 
             range = code[start..location];
+        }
+
+        private Operation ParseNumber()
+        {
+            ReadUntil(' ');
+            return new PushObjectOperation(double.Parse(range, CultureInfo.InvariantCulture));
         }
 
         Operation ParseOperation()
@@ -123,6 +124,25 @@ namespace TurtlePost
             ReadUntil(' ');
             return new PushObjectOperation(new Global(range));
         }
+
+        Operation ParseLabel()
+        {
+            var start = location;
+            do
+            {
+                if (!NextChar()) break;
+            } while (enumerator.Current != ' ' || enumerator.Current != ':');
+            if (enumerator.Current == ':')
+            {
+                return NopOperation.Instance;
+
+            } else
+            {
+                return new PushObjectOperation(new Label(code[start..location].Substring(1)));
+            }
+            
+        }
+
     }
 }        
     
