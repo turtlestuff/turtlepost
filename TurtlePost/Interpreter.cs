@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
 
 namespace TurtlePost
 {
@@ -11,17 +13,16 @@ namespace TurtlePost
         readonly Stack<object?> userStack = new Stack<object?>();
         readonly Stack<int> programStack = new Stack<int>();
         readonly GlobalBag globals = new GlobalBag();
-        Dictionary<Label, int>? labels; //label,pos
+
         public void Interpret(string code)
         {
-            labels = new Dictionary<Label, int>();
-            //setup label defs
+            var labels = new LabelBag();
+            // Search for labels in code
             var matches = labelFinder.Matches(code);
             foreach (Match i in matches)
             {
-                string s = i.Value;
-                s = s.Substring(1, s.Length - 2);
-                if (!labels.TryAdd(new Label(s), i.Index))
+                string s = i.Value[1..^1];
+                if (!labels.TryAdd(s, new Label(s, i.Index)))
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Duplicate label found: {0}:{1}", s, i.Index);
@@ -30,15 +31,9 @@ namespace TurtlePost
             }
 
 #if DEBUG
-            Console.Write("Labels: ");
-            foreach (KeyValuePair<Label, int> p in labels)
-            {
-                Console.Write(p.Key.Name + ":" + p.Value + ", ");
-            }
-            Console.WriteLine();
+            Utils.PrintLabels(labels);
 #endif
-
-            var parser = new Parser(code);
+            var parser = new Parser(code, globals, labels);
             try
             {
                 while (true)
@@ -46,7 +41,7 @@ namespace TurtlePost
                     var op = parser.NextOperation();
                     if (op == null) break;
 
-                    op.Operate(userStack, globals); // pass our globals to operator
+                    op.Operate(userStack);
                 }
             }
             catch (Exception ex)
@@ -55,8 +50,10 @@ namespace TurtlePost
                 Console.WriteLine(ex);
                 Console.ResetColor();
             }
+
 #if DEBUG
-            Utils.PrintStack(userStack, true);
+            Utils.PrintGlobals(globals);
+            Utils.PrintStack(userStack);
 #endif
         }
     }

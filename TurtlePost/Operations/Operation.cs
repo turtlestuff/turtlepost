@@ -6,6 +6,6 @@ namespace TurtlePost
 {
     public abstract class Operation
     {
-        public abstract void Operate(Stack<object?> stack, GlobalBag globals);
+        public abstract void Operate(Stack<object?> stack);
     }
 }

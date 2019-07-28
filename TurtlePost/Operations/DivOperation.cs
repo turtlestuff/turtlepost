@@ -12,7 +12,7 @@ namespace TurtlePost.Operations
 
         public static DivOperation Instance = new DivOperation();
 
-        public override void Operate(Stack<object?> stack, GlobalBag _)
+        public override void Operate(Stack<object?> stack)
         {
             var v2 = (double) stack.Pop()!;
             var v1 = (double) stack.Pop()!;

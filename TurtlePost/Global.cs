@@ -1,17 +1,15 @@
 namespace TurtlePost
 {
-    public struct Global
+    // TODO: use readonly struct
+    public class Global
     {
         public string Name { get; }
+        public object? Value { get; set; }
 
-        public Global(string name)
+        public Global(string name, object? value = null)
         {
             Name = name;
-        }
-
-        public override string ToString()
-        {
-            return "Global(" + Name + ")";
+            Value = value;
         }
     }
 }

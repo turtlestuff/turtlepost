@@ -12,7 +12,7 @@
             "program": "${workspaceFolder}/TurtlePost/bin/Debug/netcoreapp3.0/TurtlePost.dll",
             "args": [],
             "cwd": "${workspaceFolder}/TurtlePost",
-            "console": "internalConsole",
+            "console": "integratedTerminal",
             "stopAtEntry": false
         },
         {

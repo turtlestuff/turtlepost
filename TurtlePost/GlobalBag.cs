@@ -1,44 +1,28 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace TurtlePost
 {
     public class GlobalBag
     {
-        private Dictionary<Global, object?> globals = new Dictionary<Global, object?>();
+        internal Dictionary<string, Global> GlobalDictionary { get; } = new Dictionary<string, Global>();
 
-        public object? this[Global global]
+        public Global this[string name]
         {
             get
             {
-                if (globals.TryGetValue(global, out var val))
+                if (GlobalDictionary.TryGetValue(name, out var global))
                 {
-                    //the global already exists. 
-                    return val;
+                    // Global already exists; return existing global
+                    return global;
                 }
 
-                // the global doesn't exist, so we create it
-                globals.Add(global, null);
-                return null;
+                // Create new global
+                global = new Global(name);
+                GlobalDictionary.Add(name, global);
+                return global;
             }
-            set
-            {
-                if (globals.TryGetValue(global, out _))
-                {
-                    // the global already exists. now we just write to it
-                    globals[global] = value;
-                }
-                else
-                {
-                    // the global doesn't exist, so we create it
-                    globals.Add(global, value);
-                }
-            }
-        }
-
-        public void Delete(Global global)
-        {
-            globals.Remove(global);
         }
     }
 }

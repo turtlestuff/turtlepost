@@ -12,7 +12,7 @@ namespace TurtlePost.Operations
 
         public static MulOperation Instance { get; } = new MulOperation();
 
-        public override void Operate(Stack<object?> stack, GlobalBag _)
+        public override void Operate(Stack<object?> stack)
         {
             var v1 = (double) stack.Pop()!;
             var v2 = (double) stack.Pop()!;

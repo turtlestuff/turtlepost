@@ -12,7 +12,7 @@ namespace TurtlePost.Operations
 
         public static NopOperation Instance { get; } = new NopOperation();
 
-        public override void Operate(Stack<object?> stack, GlobalBag _)
+        public override void Operate(Stack<object?> stack)
         {
         }
     }

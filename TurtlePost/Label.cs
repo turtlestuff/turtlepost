@@ -4,19 +4,15 @@ using System.Text;
 
 namespace TurtlePost
 {
-    public struct Label
+    public readonly struct Label
     {
         public string Name { get; }
+        public int SourcePosition { get; }
 
-        public Label(string name)
+        public Label(string name, int position)
         {
             Name = name;
+            SourcePosition = position;
         }
-
-        public override string ToString()
-        {
-            return "Label(" + Name + ")";
-        }
-
     }
 }

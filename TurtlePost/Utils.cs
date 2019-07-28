@@ -1,44 +1,74 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
 
 namespace TurtlePost
 {
     public static class Utils
     {
-        public static void PrintStack(Stack<object?> stack, bool colors)
+        public static void PrintLabels(LabelBag labels)
         {
-            //#pragma warning disable CS8619 no longer needed because we have a Normal for loop now
-            
-            for(int i = 0; i < stack.Count; i++)
+            if (labels.Any())
             {
-                object? o = stack.ElementAt (i);
-                switch (o)
-                {
-                    case string s:
-                        if (colors) Console.ForegroundColor = ConsoleColor.Green;
-                        Console.Write('"');
-                        Console.Write(s);
-                        Console.Write('"');
-                        break;
-                    case double d:
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.Write(d);
-                        break;
-                    case Global g:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write(g);
-                        break;
-                    case null:
-                        if (colors) Console.ForegroundColor = ConsoleColor.DarkBlue;
-                        Console.Write("null");
-                        break;
-                    default:
-                        Console.Write(o);
-                        break;
-                }
-
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Labels: ");
+                Console.WriteLine(string.Join(" | ", labels.Select(p => $"@{p.Key} -> {p.Value.SourcePosition}")));
                 Console.ResetColor();
+            }
+        }
+
+        public static void PrintGlobals(GlobalBag globals)
+        {
+            if (globals.GlobalDictionary.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.Write("Globals: ");
+                Console.WriteLine(string.Join(" | ", globals.GlobalDictionary.Select(p => $"&{p.Key} = {p.Value.Value ?? "null"}")));
+                Console.ResetColor();
+            }
+        }
+
+        public static void WriteFormatted(object? o)
+        {
+            switch (o)
+            {
+                case string s:
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write('"');
+                    Console.Write(s);
+                    Console.Write('"');
+                    break;
+                case double d:
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write(d);
+                    break;
+                case Global g:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write("&{0} ", g.Name);   
+                    Console.ResetColor();
+                    Console.Write("= ");
+                    WriteFormatted(g.Value);                   
+                    break;
+                case null:
+                    Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    Console.Write("null");
+                    break;
+                default:                        
+                    Console.Write(o);
+                    break;
+            }
+            Console.ResetColor();
+        }
+
+        public static void PrintStack(Stack<object?> stack)
+        {            
+            for (int i = 0; i < stack.Count; i++)
+            {
+                object? o = stack.ElementAt(i);
+
+                WriteFormatted(o);
+
                 if (i != stack.Count - 1)
                 {
                     // Do not write separator if this is the last item

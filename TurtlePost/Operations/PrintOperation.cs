@@ -13,7 +13,7 @@ namespace TurtlePost.Operations
         public static PrintOperation Instance { get; } = new PrintOperation();
 
 
-        public override void Operate(Stack<object?> stack, GlobalBag _)
+        public override void Operate(Stack<object?> stack)
         {
             Console.Write(stack.Pop());
         }

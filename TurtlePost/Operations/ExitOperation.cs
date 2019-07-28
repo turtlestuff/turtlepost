@@ -12,7 +12,7 @@ namespace TurtlePost.Operations
 
         public static ExitOperation Instance { get; } = new ExitOperation();
 
-        public override void Operate(Stack<object?> stack, GlobalBag _)
+        public override void Operate(Stack<object?> stack)
         {
             Environment.Exit(0);
         }

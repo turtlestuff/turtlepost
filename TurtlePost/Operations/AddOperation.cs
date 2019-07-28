@@ -12,7 +12,7 @@ namespace TurtlePost.Operations
 
         public static AddOperation Instance { get; } = new AddOperation();
 
-        public override void Operate(Stack<object?> stack, GlobalBag _)
+        public override void Operate(Stack<object?> stack)
         {
             double v1 = (double) stack.Pop()!;
             double v2 = (double) stack.Pop()!;

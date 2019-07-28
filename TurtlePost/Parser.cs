@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using TurtlePost.Operations;
+using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
 
 namespace TurtlePost
 {
     ref struct Parser
     {
-        readonly string code;
+        readonly ReadOnlySpan<char> code;
+        private readonly GlobalBag globals;
+        private readonly LabelBag labels;
         ReadOnlySpan<char>.Enumerator enumerator;
-        string range;
+        ReadOnlySpan<char> buffer;
         int location;
+    
         internal static ImmutableDictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
         {
-            // maths
+            // math
             { "add",     AddOperation.Instance },
             { "sub",     SubOperation.Instance },
             { "mul",     MulOperation.Instance },
@@ -35,27 +39,26 @@ namespace TurtlePost
             { "nop",     NopOperation.Instance }
         }.ToImmutableDictionary();
         
-        public Parser(string code)
+        public Parser(ReadOnlySpan<char> code, GlobalBag globals, LabelBag labels)
         {
-            range = code;
-            location = -1;
             this.code = code;
-            enumerator = code.AsSpan().GetEnumerator();
-
+            this.globals = globals;
+            this.labels = labels;
+            buffer = code;
+            location = -1;
+            enumerator = this.code.GetEnumerator();
         }
 
-        bool NextChar()
+        bool MoveNext()
         {
-            var moved = enumerator.MoveNext();
             location++;
-
-            return moved;
+            return enumerator.MoveNext();
         }
 
         public Operation? NextOperation()
         {
             // Break on EOF
-            if (!NextChar()) return null;
+            if (!MoveNext()) return null;
 
             switch (enumerator.Current)
             {
@@ -79,68 +82,66 @@ namespace TurtlePost
             }
         }
 
-        void ReadUntil(char c)
+        void ReadToNextDelimiter(char c = ' ')
         {
             var start = location;
             do
             {
-                if (!NextChar()) break;
+                if (!MoveNext()) break;
             } while (enumerator.Current != c);
 
-            range = code[start..location];
+            buffer = code[start..location];
         }
 
         private Operation ParseNumber()
         {
-            ReadUntil(' ');
-            return new PushObjectOperation(double.Parse(range, CultureInfo.InvariantCulture));
+            ReadToNextDelimiter();
+            return new PushObjectOperation(double.Parse(buffer, provider: CultureInfo.InvariantCulture));
         }
 
         Operation ParseOperation()
         {
-            ReadUntil(' ');
+            ReadToNextDelimiter();
 
-            return Operations[range];
+            // TODO: Figure out allocation neutral way to do this
+            return Operations[buffer.ToString()];
         }
 
         PushObjectOperation ParseString()
         {
-            NextChar();
-            ReadUntil('"');
+            MoveNext(); // Skip " character
+            ReadToNextDelimiter('"');
             
-            return new PushObjectOperation(range);
+            // We don't want to hold onto the old code string just to store a string variable
+            // Thus we copy the new string object out of it so we can save memory
+            return new PushObjectOperation(buffer.ToString()); 
         }
 
         NopOperation SkipComment()
         {
-            NextChar();
-            ReadUntil('/');
+            MoveNext();  // Skip / character
+            ReadToNextDelimiter('/');
             return NopOperation.Instance;
         }
 
         PushObjectOperation ParseGlobal()
         {
-            NextChar();
-            ReadUntil(' ');
-            return new PushObjectOperation(new Global(range));
+            MoveNext(); // Skip & character
+            ReadToNextDelimiter();
+            return new PushObjectOperation(globals[buffer.ToString()]);
         }
 
         Operation ParseLabel()
         {
-            var start = location;
-            do
+            MoveNext(); // Skip @ character
+            ReadToNextDelimiter();
+            if (buffer[^1] == ':')
             {
-                if (!NextChar()) break;
-            } while (enumerator.Current != ' ' || enumerator.Current != ':');
-            if (enumerator.Current == ':')
-            {
+                // Label declaration; do not do anything
                 return NopOperation.Instance;
-
-            } else
-            {
-                return new PushObjectOperation(new Label(code[start..location].Substring(1)));
             }
             
+            return new PushObjectOperation(labels[buffer.ToString()]);
         }
 
     }

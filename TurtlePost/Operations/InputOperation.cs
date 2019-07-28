@@ -12,7 +12,7 @@ namespace TurtlePost.Operations
 
         public static InputOperation Instance { get; } = new InputOperation();
 
-        public override void Operate(Stack<object?> stack, GlobalBag _)
+        public override void Operate(Stack<object?> stack)
         {
             stack.Push(Console.ReadLine());
         }
