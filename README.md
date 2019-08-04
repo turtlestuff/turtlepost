@@ -22,7 +22,7 @@ Example:
 @powerof2
     dup mul
     ret
-    ```
+```
     
 ## Comments
 Comments must start and end with a ``/`` 
