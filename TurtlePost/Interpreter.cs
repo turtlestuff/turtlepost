@@ -13,7 +13,7 @@ namespace TurtlePost
 {
     public class Interpreter
     {
-        internal static Regex labelFinder = new Regex(@"@(\w)*:", RegexOptions.Compiled);
+        internal static Regex labelFinder = new Regex(@"@(\w)*:",RegexOptions.Compiled);
         string code = "";
         LabelBag labels = new LabelBag();
         public readonly Stack<object?> UserStack = new Stack<object?>();
@@ -22,6 +22,10 @@ namespace TurtlePost
         public CodeEnumerator Enumerator = new CodeEnumerator("");
         StringBuilder buffer = new StringBuilder();
 
+        public Interpreter()
+        {
+            labelFinder.Match(""); //precompile the regex
+        }
         public void Interpret(string code)
         {
 #if DEBUG
@@ -31,6 +35,7 @@ namespace TurtlePost
             Enumerator = new CodeEnumerator(code);
             this.code = code;
             labels.Clear();
+            labels.Add("end", new Label("end", code.Length));
             // Search for labels in code
             var matches = labelFinder.Matches(code);
             foreach (Match i in matches)
@@ -42,6 +47,7 @@ namespace TurtlePost
                     Console.WriteLine("Duplicate label found: {0}:{1}", s, i.Index);
                     Console.ResetColor();
                 }
+                
             }
 
 #if DEBUG
@@ -102,6 +108,8 @@ namespace TurtlePost
             //flow
             { "jump",   JumpOperation.Instance },
             { "call",   CallOperation.Instance },
+            { "jumpif", JumpIfOperation.Instance },
+            { "callif", CallIfOperation.Instance },
             { "ret",    ReturnOperation.Instance },
 
             // misc
