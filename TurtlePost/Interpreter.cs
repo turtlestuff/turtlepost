@@ -13,23 +13,16 @@ namespace TurtlePost
     public class Interpreter
     {
         internal static Regex labelFinder = new Regex(@"@(\w)*:", RegexOptions.Compiled);
-        string code;
-        LabelBag labels;
+        string code = "";
+        LabelBag labels = new LabelBag();
         readonly Stack<object?> userStack = new Stack<object?>();
         readonly Stack<int> programStack = new Stack<int>();
         readonly GlobalBag globals = new GlobalBag();
-        CodeEnumerator enumerator;
-        StringBuilder buffer;
-        public Interpreter()
-        {
-            labels = new LabelBag();
-            code = "";
-            buffer = new StringBuilder();
-            enumerator = new CodeEnumerator(code);
-        }
+        CodeEnumerator enumerator = new CodeEnumerator("");
+        StringBuilder buffer = new StringBuilder();
 
         public void Interpret(string code)
-        {
+            {
             enumerator = new CodeEnumerator(code);
             this.code = code;
             labels.Clear();
