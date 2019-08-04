@@ -45,10 +45,7 @@ namespace TurtlePost
                     break;
                 case Global g:
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write("&{0} ", g.Name);   
-                    Console.ResetColor();
-                    Console.Write("= ");
-                    WriteFormatted(g.Value);                   
+                    Console.Write("&{0}", g.Name);                   
                     break;
                 case null:
                     Console.ForegroundColor = ConsoleColor.DarkBlue;
@@ -63,13 +60,13 @@ namespace TurtlePost
 
         public static void PrintStack(Stack<object?> stack)
         {            
-            for (int i = 0; i < stack.Count; i++)
+            for (int i = stack.Count-1; i >= 0; i--)
             {
                 object? o = stack.ElementAt(i);
 
                 WriteFormatted(o);
 
-                if (i != stack.Count - 1)
+                if (i != 0)
                 {
                     // Do not write separator if this is the last item
                     Console.Write(" | ");
