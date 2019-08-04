@@ -51,6 +51,10 @@ namespace TurtlePost
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("@{0}", l.Name);
                     break;
+                case bool b:
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write(b.ToString().ToLower());
+                    break;
                 case null:
                     Console.ForegroundColor = ConsoleColor.DarkBlue;
                     Console.Write("null");

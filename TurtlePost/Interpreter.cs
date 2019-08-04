@@ -97,7 +97,7 @@ namespace TurtlePost
 
             //stack
             { "dup",    DuplicateOperation.Instance },
-            { "drop",   DropOperation.Instance },
+            { "drop",   DropOperation.Instance  },
 
             //flow
             { "jump",   JumpOperation.Instance },
@@ -106,7 +106,8 @@ namespace TurtlePost
 
             // misc
             { "exit",    ExitOperation.Instance },
-            { "nop",     NopOperation.Instance }
+            { "nop",     NopOperation.Instance },
+            { "help",    HelpOperation.Instance }
         }.ToImmutableDictionary();
 
         public Operation? NextOperation()
@@ -156,8 +157,18 @@ namespace TurtlePost
         Operation ParseOperation()
         {
             ReadToNextDelimiter();
-
-            return Operations[buffer.ToString()];
+            switch (buffer.ToString())
+            {
+                case "true":
+                    return new PushObjectOperation(true);
+                case "false":
+                    return new PushObjectOperation(false);
+                case "null":
+                    return new PushObjectOperation(null);
+                default:
+                    return Operations[buffer.ToString()];
+            }
+            
         }
 
         PushObjectOperation ParseString()

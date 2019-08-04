@@ -6,10 +6,10 @@ namespace TurtlePost.Operations
 {
     class PushObjectOperation : Operation
     {
-        public object Object { get; }
+        public object? Object { get; }
 
         //peekaboo! this one is only used internally!
-        public PushObjectOperation(object obj)
+        public PushObjectOperation(object? obj)
         {
             Object = obj;
         }
