@@ -12,11 +12,11 @@ namespace TurtlePost.Operations
 
         public static SubOperation Instance { get; } = new SubOperation();
 
-        public override void Operate(Stack<object?> stack)
+        public override void Operate(Interpreter interpreter)
         {
-            var v2 = (double) stack.Pop()!;
-            var v1 = (double) stack.Pop()!;
-            stack.Push(v1 - v2);
+            var v2 = (double) interpreter.UserStack.Pop()!;
+            var v1 = (double) interpreter.UserStack.Pop()!;
+            interpreter.UserStack.Push(v1 - v2);
         }
     }
 }

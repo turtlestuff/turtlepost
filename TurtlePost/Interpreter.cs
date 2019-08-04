@@ -15,15 +15,15 @@ namespace TurtlePost
         internal static Regex labelFinder = new Regex(@"@(\w)*:", RegexOptions.Compiled);
         string code = "";
         LabelBag labels = new LabelBag();
-        readonly Stack<object?> userStack = new Stack<object?>();
-        readonly Stack<int> programStack = new Stack<int>();
+        public readonly Stack<object?> UserStack = new Stack<object?>();
+        public readonly Stack<int> ProgramStack = new Stack<int>();
         readonly GlobalBag globals = new GlobalBag();
-        CodeEnumerator enumerator = new CodeEnumerator("");
+        public CodeEnumerator Enumerator = new CodeEnumerator("");
         StringBuilder buffer = new StringBuilder();
 
         public void Interpret(string code)
             {
-            enumerator = new CodeEnumerator(code);
+            Enumerator = new CodeEnumerator(code);
             this.code = code;
             labels.Clear();
             // Search for labels in code
@@ -49,7 +49,7 @@ namespace TurtlePost
                     var op = NextOperation();
                     if (op == null) break;
 
-                    op.Operate(userStack);
+                    op.Operate(this);
                 }
             }
             catch (Exception ex)
@@ -63,7 +63,7 @@ namespace TurtlePost
             Utils.PrintGlobals(globals);
 #endif
 
-            Utils.PrintStack(userStack);
+            Utils.PrintStack(UserStack);
                 
         }
       
@@ -94,9 +94,9 @@ namespace TurtlePost
         public Operation? NextOperation()
         {
             // Break on EOF
-            if (!enumerator.MoveNext()) return null;
+            if (!Enumerator.MoveNext()) return null;
 
-            switch (enumerator.Current)
+            switch (Enumerator.Current)
             {
                 case ' ':
                 case '\n':
@@ -123,9 +123,9 @@ namespace TurtlePost
             buffer.Clear();
             do
             {
-                buffer.Append(enumerator.Current);
-                if (!enumerator.MoveNext()) break;
-            } while (enumerator.Current != c);
+                buffer.Append(Enumerator.Current);
+                if (!Enumerator.MoveNext()) break;
+            } while (Enumerator.Current != c);
 
         }
 
@@ -145,7 +145,7 @@ namespace TurtlePost
 
         PushObjectOperation ParseString()
         {
-            enumerator.MoveNext(); // Skip " character
+            Enumerator.MoveNext(); // Skip " character
             ReadToNextDelimiter('"');
 
             // We don't want to hold onto the old code string just to store a string variable
@@ -155,21 +155,21 @@ namespace TurtlePost
 
         NopOperation SkipComment()
         {
-            enumerator.MoveNext();  // Skip / character
+            Enumerator.MoveNext();  // Skip / character
             ReadToNextDelimiter('/');
             return NopOperation.Instance;
         }
 
         PushObjectOperation ParseGlobal()
         {
-            enumerator.MoveNext(); // Skip & character
+            Enumerator.MoveNext(); // Skip & character
             ReadToNextDelimiter();
             return new PushObjectOperation(globals[buffer.ToString()]);
         }
 
         Operation ParseLabel()
         {
-            enumerator.MoveNext(); // Skip @ character
+            Enumerator.MoveNext(); // Skip @ character
             ReadToNextDelimiter();
             if (buffer[^1] == ':')
             {

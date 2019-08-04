@@ -14,9 +14,9 @@ namespace TurtlePost.Operations
             Object = obj;
         }
 
-        public override void Operate(Stack<object?> stack)
+        public override void Operate(Interpreter interpreter)
         {
-            stack.Push(Object);
+            interpreter.UserStack.Push(Object);
         }
     }
 }

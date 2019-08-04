@@ -12,10 +12,10 @@ namespace TurtlePost.Operations
 
         public static PushOperation Instance { get; } = new PushOperation();
 
-        public override void Operate(Stack<object?> stack)
+        public override void Operate(Interpreter interpreter)
         {
-            var global = (Global) stack.Pop()!;
-            stack.Push(global.Value);
+            var global = (Global) interpreter.UserStack.Pop()!;
+            interpreter.UserStack.Push(global.Value);
         }
     }
 }

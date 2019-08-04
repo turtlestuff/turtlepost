@@ -13,9 +13,9 @@ namespace TurtlePost.Operations
         public static PrintLineOperation Instance { get; } = new PrintLineOperation();
 
 
-        public override void Operate(Stack<object?> stack)
+        public override void Operate(Interpreter interpreter)
         {
-            Console.WriteLine(stack.Pop());
+            Console.WriteLine(interpreter.UserStack.Pop());
         }
     }
 }
