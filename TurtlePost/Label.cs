@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TurtlePost
 {
-    public readonly struct Label
+    public class Label
     {
         public string Name { get; }
         public int SourcePosition { get; }
@@ -15,4 +15,4 @@ namespace TurtlePost
             SourcePosition = position;
         }
     }
-}
+    }

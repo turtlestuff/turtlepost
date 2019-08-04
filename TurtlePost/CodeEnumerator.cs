@@ -6,19 +6,19 @@ namespace TurtlePost
 {
     public class CodeEnumerator
     {
-        int position;
+        public int Position;
         string code;
         public CodeEnumerator(string gcode, int gpos = -1)
         {
             code = gcode;
-            position = gpos;
+            Position = gpos;
         }
 
-        public char Current { get => code[position]; }
+        public char Current { get => code[Position]; }
 
         public bool MoveNext()
         {
-            if(++position >= code.Length)
+            if(++Position >= code.Length)
             {
                 return false;
             }   
@@ -28,12 +28,12 @@ namespace TurtlePost
 
         public bool SetPosition(int pos)
         {
-            if(pos < 0 | pos >= code.Length)
+            if(pos < -1 | pos >= code.Length)
             {
                 return false;
             }
 
-            position = pos;
+            Position = pos;
             return true;
 
         }

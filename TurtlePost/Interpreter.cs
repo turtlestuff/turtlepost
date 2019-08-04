@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
 using TurtlePost.Operations;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace TurtlePost
 {
@@ -22,7 +23,11 @@ namespace TurtlePost
         StringBuilder buffer = new StringBuilder();
 
         public void Interpret(string code)
-            {
+        {
+#if DEBUG
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+#endif
             Enumerator = new CodeEnumerator(code);
             this.code = code;
             labels.Clear();
@@ -60,7 +65,11 @@ namespace TurtlePost
             }
 
 #if DEBUG
+            sw.Stop();
             Utils.PrintGlobals(globals);
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("Execution time: {0}ms", sw.ElapsedMilliseconds);
+            Console.ResetColor();
 #endif
 
             Utils.PrintStack(UserStack);
@@ -85,7 +94,16 @@ namespace TurtlePost
             { "println", PrintLineOperation.Instance },
             { "print",   PrintOperation.Instance },
             { "input",   InputOperation.Instance },
-            
+
+            //stack
+            { "dup",    DuplicateOperation.Instance },
+            { "drop",   DropOperation.Instance },
+
+            //flow
+            { "jump",   JumpOperation.Instance },
+            { "call",   CallOperation.Instance },
+            { "ret",    ReturnOperation.Instance },
+
             // misc
             { "exit",    ExitOperation.Instance },
             { "nop",     NopOperation.Instance }
@@ -132,14 +150,13 @@ namespace TurtlePost
         private Operation ParseNumber()
         {
             ReadToNextDelimiter();
-            return new PushObjectOperation(double.Parse(buffer.ToString(), provider: CultureInfo.InvariantCulture)); ;
+            return new PushObjectOperation(double.Parse(buffer.ToString(), provider: CultureInfo.InvariantCulture));
         }
 
         Operation ParseOperation()
         {
             ReadToNextDelimiter();
 
-            // TODO: Figure out allocation neutral way to do this
             return Operations[buffer.ToString()];
         }
 
@@ -148,8 +165,6 @@ namespace TurtlePost
             Enumerator.MoveNext(); // Skip " character
             ReadToNextDelimiter('"');
 
-            // We don't want to hold onto the old code string just to store a string variable
-            // Thus we copy the new string object out of it so we can save memory
             return new PushObjectOperation(buffer.ToString());
         }
 
