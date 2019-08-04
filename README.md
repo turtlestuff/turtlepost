@@ -21,7 +21,7 @@ Example:
 print /prints 16/
 @end jump
 
-@powerof2
+@powerof2:
     dup mul
     ret
 ```
