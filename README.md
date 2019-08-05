@@ -27,7 +27,7 @@ print /prints 16/
 Comments must start and end with a ``/`` 
 
 ## Operations Reference
-`add sub mul div mod write push print println input dup drop not and or xor eq gt lt gte lte string parse jump call jumpif callif ret exit nop help`
+`add sub mul div mod write push print println input dup drop swap not and or xor eq gt lt gte lte string parse jump call jumpif callif ret exit nop help`
 ### Math
 | Name  | Operation                                                                                          |
 |-------|----------------------------------------------------------------------------------------------------|
@@ -51,11 +51,11 @@ Comments must start and end with a ``/``
 | `input`   | Reads a line of text from the standard input and pushes the string.                 |
 
 ### Stack Manipulation
-| Name   | Operation                         |
-|--------|-----------------------------------|
-| `dup`  | Pops a value and pushes it twice. |
-| `drop` | Pops a value, discarding it.      |
-
+| Name   | Operation                            | 
+|--------|--------------------------------------|
+| `dup`  | Pops a value and pushes it twice.    |
+| `drop` | Pops a value, discarding it.         |
+| `swap` | Swaps the top 2 values on the stack. |
 
 ### Boolean Logic
 | Name  | Operation                                                              |

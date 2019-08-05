@@ -46,23 +46,24 @@ namespace TurtlePost
             // Stack manipulation
             { "dup",     DuplicateOperation.Instance },
             { "drop",    DropOperation.Instance  },
-            
+            { "swap",    SwapOperation.Instance },
+
             // Boolean logic
-            { "not",    NotOperation.Instance },
-            { "and",    AndOperation.Instance },
-            { "or",     OrOperation.Instance },
-            { "xor",    XorOperation.Instance },
+            { "not",     NotOperation.Instance },
+            { "and",     AndOperation.Instance },
+            { "or",      OrOperation.Instance },
+            { "xor",     XorOperation.Instance },
             
             // Comparisons
-            { "eq",     EqualsOperation.Instance },
-            { "gt",     GreaterThanOperation.Instance },
-            { "lt",     LessThanOperation.Instance },
-            { "gte",    GreaterThanOrEqualToOperation.Instance },
-            { "lte",    LessThanOrEqualToOperation.Instance },
+            { "eq",      EqualsOperation.Instance },
+            { "gt",      GreaterThanOperation.Instance },
+            { "lt",      LessThanOperation.Instance },
+            { "gte",     GreaterThanOrEqualToOperation.Instance },
+            { "lte",     LessThanOrEqualToOperation.Instance },
             
             // Conversions
-            { "string", StringOperation.Instance },
-            { "parse",  ParseOperation.Instance },
+            { "string",  StringOperation.Instance },
+            { "parse",   ParseOperation.Instance },
 
             // Control flow
             { "jump",    JumpOperation.Instance },
