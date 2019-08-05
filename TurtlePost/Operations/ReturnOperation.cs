@@ -13,7 +13,7 @@ namespace TurtlePost.Operations
 
         public override void Operate(Interpreter interpreter)
         {
-            interpreter.Enumerator.SetPosition(interpreter.ProgramStack.Pop()!);
+            interpreter.Enumerator.TrySetPosition(interpreter.CallStack.Pop()!);
         }
     }
 }

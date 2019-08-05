@@ -7,12 +7,12 @@ namespace TurtlePost
     public class Label
     {
         public string Name { get; }
-        public int SourcePosition { get; }
+        public int Position { get; }
 
         public Label(string name, int position)
         {
             Name = name;
-            SourcePosition = position;
+            Position = position;
         }
     }
     }

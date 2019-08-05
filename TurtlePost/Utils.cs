@@ -5,7 +5,7 @@ using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>
 
 namespace TurtlePost
 {
-    public static class Utils
+    static class Utils
     {
         public static void PrintLabels(LabelBag labels)
         {
@@ -13,7 +13,7 @@ namespace TurtlePost
             {
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.Write("Labels: ");
-                Console.WriteLine(string.Join(" | ", labels.Select(p => $"@{p.Key} -> {p.Value.SourcePosition}")));
+                Console.WriteLine(string.Join(" | ", labels.Select(p => $"@{p.Key} -> {p.Value.Position.ToString()}")));
                 Console.ResetColor();
             }
         }
@@ -29,7 +29,7 @@ namespace TurtlePost
             }
         }
 
-        public static void WriteFormatted(object? o)
+        public static void WriteFormatted<T>(T o)
         {
             switch (o)
             {
@@ -40,27 +40,27 @@ namespace TurtlePost
                     Console.Write('"');
                     break;
                 case double d:
-                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write(d);
                     break;
                 case Global g:
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.ForegroundColor = ConsoleColor.Blue;
                     Console.Write("&{0}", g.Name);                   
                     break;
                 case Label l:
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.Write("@{0}", l.Name);
                     break;
                 case bool b:
-                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.ForegroundColor = ConsoleColor.DarkBlue;
                     Console.Write(b.ToString().ToLower());
                     break;
                 case null:
-                    Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.Write("null");
                     break;
                 default:                        
-                    Console.Write(o);
+                    Console.Write(o.ToString());
                     break;
             }
             Console.ResetColor();
@@ -68,9 +68,9 @@ namespace TurtlePost
 
         public static void PrintStack(Stack<object?> stack)
         {            
-            for (int i = stack.Count-1; i >= 0; i--)
+            for (var i = stack.Count-1; i >= 0; i--)
             {
-                object? o = stack.ElementAt(i);
+                var o = stack.ElementAt(i);
 
                 WriteFormatted(o);
 

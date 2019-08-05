@@ -4,10 +4,11 @@ using System.Collections.Generic;
 
 namespace TurtlePost
 {
-    public class GlobalBag
+    internal class GlobalBag
     {
-        internal Dictionary<string, Global> GlobalDictionary { get; } = new Dictionary<string, Global>();
+        public Dictionary<string, Global> GlobalDictionary { get; } = new Dictionary<string, Global>();
 
+        // TODO: Figure out allocation neutral way to do this
         public Global this[string name]
         {
             get
@@ -19,8 +20,9 @@ namespace TurtlePost
                 }
 
                 // Create new global
-                global = new Global(name);
-                GlobalDictionary.Add(name, global);
+                var nameStr = name.ToString();
+                global = new Global(nameStr);
+                GlobalDictionary.Add(nameStr, global);
                 return global;
             }
         }

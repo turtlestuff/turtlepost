@@ -6,18 +6,20 @@ namespace TurtlePost.Operations
 {
     class CallIfOperation : Operation
     {
-        CallIfOperation() { }
+        CallIfOperation()
+        {
+        }
 
         public static CallIfOperation Instance { get; } = new CallIfOperation();
 
         public override void Operate(Interpreter interpreter)   
         {
-            Label label = (Label)interpreter.UserStack.Pop()!;
-            bool cond = (bool)interpreter.UserStack.Pop()!;
+            var label = (Label) interpreter.UserStack.Pop()!;
+            var cond = (bool) interpreter.UserStack.Pop()!;
             if (cond)
             {
-                interpreter.ProgramStack.Push(interpreter.Enumerator.Position);
-                interpreter.Enumerator.SetPosition(label.SourcePosition - 1);
+                interpreter.CallStack.Push(interpreter.Enumerator.Position);
+                interpreter.Enumerator.TrySetPosition(label.Position - 1);
             }
         }
     }

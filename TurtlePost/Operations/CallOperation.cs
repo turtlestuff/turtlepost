@@ -6,15 +6,17 @@ namespace TurtlePost.Operations
 {
     class CallOperation : Operation
     {
-        CallOperation() { }
+        CallOperation()
+        {
+        }
 
         public static CallOperation Instance { get; } = new CallOperation();
 
         public override void Operate(Interpreter interpreter)
         {
-            Label label = (Label)interpreter.UserStack.Pop()!;
-            interpreter.ProgramStack.Push(interpreter.Enumerator.Position);
-            interpreter.Enumerator.SetPosition(label.SourcePosition-1);
+            var label = (Label) interpreter.UserStack.Pop()!;
+            interpreter.CallStack.Push(interpreter.Enumerator.Position);
+            interpreter.Enumerator.TrySetPosition(label.Position-1);
         }
     }
 }

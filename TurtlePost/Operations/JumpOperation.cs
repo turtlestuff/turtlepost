@@ -6,14 +6,16 @@ namespace TurtlePost.Operations
 {
     class JumpOperation : Operation
     {
-        JumpOperation() { }
+        JumpOperation()
+        {
+        }
 
         public static JumpOperation Instance { get; } = new JumpOperation();
 
         public override void Operate(Interpreter interpreter)
         {
-            Label label = (Label)interpreter.UserStack.Pop()!;
-            interpreter.Enumerator.SetPosition(label.SourcePosition - 1);
+            var label = (Label) interpreter.UserStack.Pop()!;
+            interpreter.Enumerator.TrySetPosition(label.Position - 1);
         }
     }
 }

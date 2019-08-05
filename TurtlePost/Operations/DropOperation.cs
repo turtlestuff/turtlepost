@@ -6,7 +6,9 @@ namespace TurtlePost.Operations
 {
     class DropOperation : Operation
     {
-        DropOperation() { }
+        DropOperation()
+        {
+        }
 
         public static DropOperation Instance { get; } = new DropOperation();
 
@@ -14,6 +16,5 @@ namespace TurtlePost.Operations
         {
             interpreter.UserStack.Pop();
         }
-
     }
 }

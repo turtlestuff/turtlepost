@@ -14,8 +14,8 @@ namespace TurtlePost.Operations
 
         public override void Operate(Interpreter interpreter)
         {
-            double v1 = (double) interpreter.UserStack.Pop()!;
-            double v2 = (double) interpreter.UserStack.Pop()!;
+            var v1 = (double) interpreter.UserStack.Pop()!;
+            var v2 = (double) interpreter.UserStack.Pop()!;
             interpreter.UserStack.Push(v1 + v2);
         }
     }
