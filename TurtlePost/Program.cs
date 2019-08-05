@@ -14,7 +14,7 @@ namespace TurtlePost
         {
             if (args.Length == 0)
             {
-                Console.WriteLine($"TurtlePost Version {Assembly.GetExecutingAssembly().GetName().Version}");
+                Console.WriteLine($"TurtlePost Blueprint {Assembly.GetExecutingAssembly().GetName().Version}");
                 Console.WriteLine("By Vrabbers and Reflectronic, (c) 2019");
                 Console.WriteLine("Type help for a list of operations");
                 var directInterpreter = new Interpreter();
