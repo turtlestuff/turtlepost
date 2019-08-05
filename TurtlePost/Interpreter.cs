@@ -84,23 +84,23 @@ namespace TurtlePost
                     
                     switch (Enumerator.Current)
                     {
-                        case char c when char.IsWhiteSpace(c):
-                            continue;
-                        case char c when char.IsDigit(c):
-                            ParseNumber();
-                            continue;
                         case '&':
                             ParseGlobal();
                             continue;
                         case '"':
                             ParseString();
                             continue;
+                        case '@':
+                            ParseLabel();
+                            continue;
                         case '/':
                             SkipComment();
                             continue;
                         case '.':
-                        case '@':
-                            ParseLabel();
+                        case char c when char.IsDigit(c):
+                            ParseNumber();
+                            continue;
+                        case char c when char.IsWhiteSpace(c):
                             continue;
                         default:
                             ParseOperation()?.Operate(this);
