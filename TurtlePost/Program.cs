@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using System.IO;
 
 namespace TurtlePost
 {
@@ -11,16 +12,28 @@ namespace TurtlePost
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("TurtlePost Development");
-            Console.WriteLine("By Vrabbers and Reflectronic, 2019");
-            var directInterpreter = new Interpreter();
-
-            while (true)
+            if (args.Length == 0)
             {
-                Console.Write(">");
-                var toInterpret = Console.ReadLine();
+                Console.WriteLine("TurtlePost");
+                Console.WriteLine("By Vrabbers and Reflectronic, 2019");
+                Console.WriteLine("To get the operation dictionary, type help");
+                var directInterpreter = new Interpreter();
 
-                directInterpreter.Interpret(toInterpret);
+                while (true)
+                {
+                    Console.Write(">");
+                    var toInterpret = Console.ReadLine();
+
+                    directInterpreter.Interpret(toInterpret,true);
+                }
+            } else
+            {
+                //load Felis
+                string code = File.ReadAllText(args[0]);
+                new Interpreter().Interpret(code,false);
+                Console.WriteLine();
+                Console.WriteLine("Press a key to exit...");
+                Console.ReadKey();
             }
         }
     }

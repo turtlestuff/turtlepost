@@ -1,5 +1,5 @@
 # TurtlePost
-TurtlePost is a simple, dynamic, stack-based postfix language which is currently in development.
+TurtlePost is a simple, dynamic, stack-based postfix language which is currently in development. To launch in direct mode, use ``turtlepost``. If you want to load a file (extension is .tpost) you should use ``turtlepost file.extension``    
 
 ## The stack
 The stack is dynamic, which means it accepts all types. To push absolute values to the stack, you just type the values, followed by a space. So if you type ``2 4``, your stack will now be ``2 | 4``. Strings can be pushed using quotes and ``null``, ``true`` and ``false`` are pushed using their names. You can use ``dup`` to duplicate the top value on the stack, and ``drop`` to delete it.

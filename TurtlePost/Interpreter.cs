@@ -84,7 +84,7 @@ namespace TurtlePost
         
         readonly GlobalBag globals = new GlobalBag();
 
-        public void Interpret(string code)
+        public void Interpret(string code, bool direct)
         {
 #if DEBUG
             var sw = Stopwatch.StartNew();
@@ -141,10 +141,12 @@ namespace TurtlePost
             Console.WriteLine("Execution time: {0}ms", sw.ElapsedMilliseconds);
             Console.ResetColor();
 #endif
-
-            Utils.PrintStack(UserStack);
-            labels.Clear();
-            CallStack.Clear();
+            if (direct)
+            {
+                Utils.PrintStack(UserStack);
+                labels.Clear();
+                CallStack.Clear();
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -169,13 +171,13 @@ namespace TurtlePost
             }
         }
 
-        ReadOnlySpan<char> ReadToNextDelimiter(char c = ' ')
+        ReadOnlySpan<char> ReadToNextDelimiter(char? c = null)
         {
             var start = Enumerator.Position;
             do
             {
                 if (!Enumerator.MoveNext()) break;
-            } while (Enumerator.Current != c);
+            } while (c == null ? !char.IsWhiteSpace(Enumerator.Current) : c != Enumerator.Current);
 
             return Code[start..Enumerator.Position];
         }
