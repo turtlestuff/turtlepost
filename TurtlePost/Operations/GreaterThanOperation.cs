@@ -4,19 +4,19 @@ using System.Text;
 
 namespace TurtlePost.Operations
 {
-    class DivOperation : Operation
+    class GreaterThanOperation : Operation
     {
-        DivOperation()
+        GreaterThanOperation()
         {
         }
 
-        public static DivOperation Instance = new DivOperation();
+        public static GreaterThanOperation Instance { get; } = new GreaterThanOperation();
 
         public override void Operate(Interpreter interpreter)
         {
-            var v2 = (double) interpreter.UserStack.Pop()!;
             var v1 = (double) interpreter.UserStack.Pop()!;
-            interpreter.UserStack.Push(v1 / v2);
+            var v2 = (double) interpreter.UserStack.Pop()!;
+            interpreter.UserStack.Push(v2 > v1);
         }
     }
 }

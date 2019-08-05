@@ -30,33 +30,50 @@ namespace TurtlePost
             // Math
             { "add",     AddOperation.Instance },
             { "sub",     SubOperation.Instance },
-            { "mul",     MulOperation.Instance },
-            { "div",     DivOperation.Instance },
-            { "mod",     ModOperation.Instance },
+            { "mul",     MultiplyOperation.Instance },
+            { "div",     DivideOperation.Instance },
+            { "mod",     ModuloOperation.Instance },
             
             // Globals
             { "write",   WriteOperation.Instance },
             { "push",    PushOperation.Instance },
 
             // I/O
-            { "println", PrintLineOperation.Instance },
             { "print",   PrintOperation.Instance },
+            { "println", PrintLineOperation.Instance },
             { "input",   InputOperation.Instance },
 
-            // Stack
+            // Stack manipulation
             { "dup",     DuplicateOperation.Instance },
             { "drop",    DropOperation.Instance  },
+            
+            // Boolean logic
+            { "not",    NotOperation.Instance },
+            { "and",    AndOperation.Instance },
+            { "or",     OrOperation.Instance },
+            { "xor",    XorOperation.Instance },
+            
+            // Comparisons
+            { "eq",     EqualsOperation.Instance },
+            { "gt",     GreaterThanOperation.Instance },
+            { "lt",     LessThanOperation.Instance },
+            { "gte",    GreaterThanOrEqualToOperation.Instance },
+            { "lte",    LessThanOrEqualToOperation.Instance },
+            
+            // Conversions
+            { "string", StringOperation.Instance },
+            { "parse",  ParseOperation.Instance },
 
-            // Flow
+            // Control flow
             { "jump",    JumpOperation.Instance },
             { "call",    CallOperation.Instance },
             { "jumpif",  JumpIfOperation.Instance },
             { "callif",  CallIfOperation.Instance },
             { "ret",     ReturnOperation.Instance },
 
-            // Misc
+            // Miscellaneous 
             { "exit",    ExitOperation.Instance },
-            { "nop",     NopOperation.Instance },
+            { "nop",     NoOperation.Instance },
             { "help",    HelpOperation.Instance }
         };
 
@@ -85,25 +102,25 @@ namespace TurtlePost
                     switch (Enumerator.Current)
                     {
                         case '&':
-                            ParseGlobal();
+                            ReadGlobal();
                             continue;
                         case '"':
-                            ParseString();
+                            ReadString();
                             continue;
                         case '@':
-                            ParseLabel();
+                            ReadLabel();
                             continue;
                         case '/':
                             SkipComment();
                             continue;
                         case '.':
                         case char c when char.IsDigit(c):
-                            ParseNumber();
+                            ReadNumber();
                             continue;
                         case char c when char.IsWhiteSpace(c):
                             continue;
                         default:
-                            ParseOperation()?.Operate(this);
+                            ReadOperation()?.Operate(this);
                             continue;
                     }
                 }
@@ -162,13 +179,13 @@ namespace TurtlePost
             return Code[start..Enumerator.Position];
         }
 
-        void ParseNumber()
+        void ReadNumber()
         {
             var buffer = ReadToNextDelimiter();
             UserStack.Push(double.Parse(buffer, provider: CultureInfo.InvariantCulture));
         }
         
-        Operation? ParseOperation()
+        Operation? ReadOperation()
         {
             var buffer = ReadToNextDelimiter();
             switch (buffer)
@@ -187,7 +204,7 @@ namespace TurtlePost
             }
         }
 
-        void ParseString()
+        void ReadString()
         {
             Enumerator.MoveNext(); // Skip " character
             UserStack.Push(ReadToNextDelimiter('"').ToString());
@@ -199,14 +216,14 @@ namespace TurtlePost
             ReadToNextDelimiter('/');
         }
 
-        void ParseGlobal()
+        void ReadGlobal()
         {
             Enumerator.MoveNext(); // Skip & character
             var buffer = ReadToNextDelimiter();
             UserStack.Push(globals[buffer.ToString()]);
         }
 
-        void ParseLabel()
+        void ReadLabel()
         {
             Enumerator.MoveNext(); // Skip @ character
             var buffer = ReadToNextDelimiter();

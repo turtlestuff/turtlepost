@@ -4,13 +4,13 @@ using System.Text;
 
 namespace TurtlePost.Operations
 {
-    class NopOperation : Operation
+    class NoOperation : Operation
     {
-        NopOperation()
+        NoOperation()
         {
         }
 
-        public static NopOperation Instance { get; } = new NopOperation();
+        public static NoOperation Instance { get; } = new NoOperation();
 
         public override void Operate(Interpreter interpreter)
         {
