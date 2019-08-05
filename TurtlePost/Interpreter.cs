@@ -84,7 +84,7 @@ namespace TurtlePost
         
         readonly GlobalBag globals = new GlobalBag();
 
-        public void Interpret(string code, bool direct)
+        public void Interpret(string code, bool printStack)
         {
 #if DEBUG
             var sw = Stopwatch.StartNew();
@@ -141,7 +141,7 @@ namespace TurtlePost
             Console.WriteLine("Execution time: {0}ms", sw.ElapsedMilliseconds);
             Console.ResetColor();
 #endif
-            if (direct)
+            if (printStack)
             {
                 Utils.PrintStack(UserStack);
                 labels.Clear();

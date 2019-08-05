@@ -8,15 +8,15 @@ using System.IO;
 
 namespace TurtlePost
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("TurtlePost");
-                Console.WriteLine("By Vrabbers and Reflectronic, 2019");
-                Console.WriteLine("To get the operation dictionary, type help");
+                Console.WriteLine($"TurtlePost Version {Assembly.GetExecutingAssembly().GetName().Version}");
+                Console.WriteLine("By Vrabbers and Reflectronic, (c) 2019");
+                Console.WriteLine("Type help for a list of operations");
                 var directInterpreter = new Interpreter();
 
                 while (true)
@@ -26,10 +26,11 @@ namespace TurtlePost
 
                     directInterpreter.Interpret(toInterpret,true);
                 }
-            } else
+            } 
+            else
             {
-                //load Felis
-                string code = File.ReadAllText(args[0]);
+                // Load file
+                var code = File.ReadAllText(args[0]);
                 new Interpreter().Interpret(code,false);
                 Console.WriteLine();
                 Console.WriteLine("Press a key to exit...");
