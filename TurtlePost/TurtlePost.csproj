@@ -13,6 +13,8 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <PublishTrimmed>true</PublishTrimmed>
     <PublishSingleFile>true</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
   </PropertyGroup>
   
 </Project>
