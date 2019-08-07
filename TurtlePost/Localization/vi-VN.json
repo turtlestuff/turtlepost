@@ -1,5 +1,6 @@
 {
     "helpPrompt": "Gõ help để xem danh sách hoạt động",
     "versionString": "TurtlePost Phiên Bản {0}",
-    "exitPrompt": "Gõ phím bất kỳ để thoát..."
+    "exitPrompt": "Gõ phím bất kỳ để thoát...",
+    "exitExplanation": "Để thoát TurtlePost, gõ CTRL+D hoặc sử dụng lệnh exit."
 }

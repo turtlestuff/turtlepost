@@ -27,6 +27,7 @@ namespace TurtlePost
         private static Dictionary<KeyPressed, Action> Keys = new Dictionary<KeyPressed, Action> {
             {new KeyPressed(ConsoleKey.D, ConsoleModifiers.Control), () => {
                 if (CurrentInput == "") {
+                    Console.WriteLine("exit");
                     DirectInterpreter.Interpret("exit", true);
                     InputComplete = true;
                 } else {
@@ -53,6 +54,10 @@ namespace TurtlePost
             {new KeyPressed(ConsoleKey.C, ConsoleModifiers.Control), () => {
                 //Reset the input buffer
                 Console.WriteLine();
+                if (CurrentInput == "") {
+                    //Print a message stating how to exit
+                    Console.WriteLine(_("exitExplanation"));
+                }
                 InputComplete = true;
             }}
         };

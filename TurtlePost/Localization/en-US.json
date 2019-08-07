@@ -1,5 +1,6 @@
 {
     "helpPrompt": "Type help for a list of operations",
     "versionString": "TurtlePost Version {0}",
-    "exitPrompt": "Press a key to exit..."
+    "exitPrompt": "Press a key to exit...",
+    "exitExplanation": "To exit TurtlePost, hit CTRL+D or use the exit operation."
 }
