@@ -66,7 +66,7 @@ namespace TurtlePost
         {
             if (args.Length == 0)
             {
-                Console.WriteLine(string.Format(_("versionString"), Assembly.GetExecutingAssembly().GetName().Version));
+                Console.WriteLine(string.Format(_("versionString"), Assembly.GetExecutingAssembly().GetName().Version + " 🐢"));
                 Console.WriteLine("By Vrabbers and Reflectronic, (c) 2019");
                 Console.WriteLine(_("helpPrompt"));
                 
