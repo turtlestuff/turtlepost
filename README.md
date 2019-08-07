@@ -1,18 +1,104 @@
 # TurtlePost
-TurtlePost is a simple, dynamic, stack-based postfix language which is currently in development. To launch in direct mode, use ``turtlepost``. If you want to load a file (extension is .tpost) you should use ``turtlepost file.extension``    
+TurtlePost is a simple, interpreted, dynamic, stack-based postfix language.
 
-## The stack
-The stack is dynamic, which means it accepts all types. To push absolute values to the stack, you just type the values, followed by a space. So if you type ``2 4``, your stack will now be ``2 | 4``. Strings can be pushed using quotes and ``null``, ``true`` and ``false`` are pushed using their names. You can use ``dup`` to duplicate the top value on the stack, and ``drop`` to delete it.
+#### [Download TurtlePost 1.0.0](https://github.com/turtlestuff/turtlepost/releases)
 
-## Postfix
-Postfix means the operation come after it's parameters. To do 5 - 4, for exaample, you would do ``5 4 sub``. To print a string, you do ``"hello world" println``. This has the implication that parentheses are no longer needed. (3 + 4) * 2 would be done as ``3 4 add 2 mul``, and so on.
+## Running TurtlePost
+TurtlePost releases are posted on the releases page with the .NET runtime embedded. You can also build TurtlePost from source using the standard `dotnet` CLI commands or a .NET IDE. To start the REPL, run the executable without any arguments. To run a `.tpost` script, pass the path as the first argument to the executable.
 
-## Globals
-Globals always are prefixed with &. When you type &global, a "pointer" to the global called "global" is pushed onto the stack. The operation ``value &global write`` is used to write a value to the variable. The operation ``&global push`` pushed the value onto the stack. 
+## TurtlePost Language
+TurtlePost is designed strictly around stack-based execution. Expressions push and pop values from the main 'user stack' (or simply, 'the stack').
 
-## Program flow
-Labels are created using ``@label:``. They are scanned for before any execution is done. There is also a hidden label called ``@end:`` which points to the end of the program. To put a label into the stack, use ``@label``. By using ``@label jump``, you can simply jump execution to that label. By using ``call``, you can make subroutines. ``call`` will also jump to the label specified, but also push the current position into the program stack (which is separate from the user stack). In the end of the subroutine, a ``ret`` instruction is expected, which will take the position from the program stack and go back. There are also conditional variants, ``condition @label jumpif`` and ``condition @label callif``, which only jump if the ``condition`` is ``true``.
-Example: 
+### Syntax
+TurtlePost has very simple syntax. All TurtlePost scripts are comprised of one or more value or operation expressions, each separated by spaces. 
+
+TurtlePost supports basic types of values:
+- Double-precision floating point numbers (`2`, `.5`)
+- Boolean values (`true` and `false`)
+- Strings (`"Hello"`, `"Alien \U0001F47D"`)
+- Globals (`&var`)
+- Labels (`@label`)
+- Null (`null`)
+
+A list of all operations and their functions is described [below](#operations-reference).
+
+Comments are started and ended with a forward slash (`/sample comment/`).
+
+### The Stack
+The stack is simply a 'last in, first out' buffer of objects. Typing a value expression into TurtlePost pushes that value onto the top of the stack. Operations can pop/consume values off of the top of the stack, perform operations on those values, and push new values onto the stack. The stack stores values of any type (even if operations do not work on all types).
+
+```
+> 2 /pushes 2 onto the stack/
+2
+> 3 /pushes 3 onto the stack, on top of the 2/
+2 | 3
+```
+
+### Postfix
+Due to the stack-based nature of TurtlePost, operations are said to be *postfix*, or following their operands. To add two numbers, you would write something like this:
+```
+> 2 3 add
+5
+```
+As we learned, writing `2 3` pushes both 2 and 3 onto the stack. `add` is an *operation* that, as may be apparent to you, adds numbers. Specifically, it pops two numbers from the top of the stack, adds the first one to the second, and pushes the resulting sum. There are many operations; just to demonstrate some easy ones:
+```
+> "hello" /pushes the string 'hello' to the stack/
+"hello"
+> print /pops the top value on the stack and prints it to the console/
+hello
+```
+
+```
+> 5 3 /pushes 5 and 3 to the stack/
+5 | 3
+> gt /pops the top 2 values, checks if the second is greater than the first, and pushes the result/
+true
+```
+
+```
+> help /prints a list of all operations/
+add sub mul div mod... (remaining omitted for brevity)
+
+> exit /exits the interpreter/
+```
+It may be helpful to think of some of these operations in terms of 'ordinary' mathematical notation. For example, `5 3 gt` corresponds to `5 > 3`.
+
+### Globals
+Globals are values that represent references to other values. A global has a name, which always starts with &. When you first use a global, it is declared in memory. Once they are created, they cannot be removed (although, they can be easily reused). Typing in the name of a global pushes the global itself to the stack.
+```
+> &var &var2 &var3
+/Globals: &var = null, &var2 = null, &var3 = null/
+&var | &var2 | &var3
+```
+
+Globals can be written to using the `write` operation. It pops a global and a value, writing the value into the global. Their value can be retrieved using the `push` operation, which pops a global and pushes its value. Even if there are no remaining references to a global on the stack, it is still there and its value can be referred to at a later time.
+```
+> 5 &var write
+/Globals: &var = 5/
+
+> &var push
+/Globals: &var = 5/
+5
+```
+
+### Labels
+Labels are values that represent their source location. A label has a name, which always begins with @. Labels are declared with a trailing colon (`@label:`) and subsequently referred to without the colon (`@label`). Before input is interpreted, a quick pass of the source is done to scan for all label declarations. The interpreter also autogenerates a lebal called `@end` at the end of each input string.
+
+Like globals, referring to a label pushes it onto the stack. The `jump` operation pops a label and unconditionally transfers control of the program to the code starting from the label. Unlike globals, labels are cleared every time an expression is evaluated in the REPL.
+```
+> "Hello" println
+> 2 3 add println
+> @label jump
+> "I am skipped" println
+> 
+> @label:
+>     "Jumped" println
+Hello
+5
+Jumped
+```
+### Subroutines
+Labels can also be used to denote *subroutines*. A subroutine is similar to a jump, but expected to use the `ret` operation to return to where it was called from. The `call` operation is used to jump to a subroutine.
 ```
 4 @powerof2 call
 print /prints 16/
@@ -22,20 +108,21 @@ print /prints 16/
     dup mul
     ret
 ```
-    
-## Comments
-Comments must start and end with a ``/`` 
+The `call` operation pops a label, saves the current source location to the *call stack*, and unconditionally transfers control of the program to the code starting from the label. When the code hits a `ret` operation, it will pop the previous source location from the call stack and unconditionally start executing from there. 
+
+Note that subroutines will still be executed as normal code if the interpreter reaches the subroutine's code. Since the call stack would be empty at this point, the `ret` operation would cause an error. Thus, it is advised to place all subroutines after an `@end jump` at the end of the file, so that the interpreter does not attempt to run subroutines with an empty call stack.
 
 ## Operations Reference
 `add sub mul div mod write push print println input dup drop swap not and or xor eq gt lt gte lte string parse jump call jumpif callif ret exit nop help`
+
 ### Math
-| Name  | Operation                                                                                          |
-|-------|----------------------------------------------------------------------------------------------------|
-| `add` | Pops two values, adds the first to the second, and pushes the sum.                                 |
-| `sub` | Pops two values, subtracts the first from the second, and pushes the difference.                   |
-| `mul` | Pops two values, multiplies the first by the second, and pushes the product.                       |
-| `div` | Pops two values, divides the first by the second, and pushes the quotient.                         |
-| `mod` | Pops two values, divides the first by the second, and pushes the remainder.                        |
+| Name  | Operation                                                                                                    |
+|-------|--------------------------------------------------------------------------------------------------------------|
+| `add` | Pops two values, adds the first to the second, and pushes the resulting sum.                                 |
+| `sub` | Pops two values, subtracts the first from the second, and pushes the resulting difference.                   |
+| `mul` | Pops two values, multiplies the first by the second, and pushes the resulting product.                       |
+| `div` | Pops two values, divides the first by the second, and pushes the resulting quotient.                         |
+| `mod` | Pops two values, divides the first by the second, and pushes the resulting remainder.                        |
 
 ### Globals
 | Name    | Operation                                                          |
@@ -51,11 +138,11 @@ Comments must start and end with a ``/``
 | `input`   | Reads a line of text from the standard input and pushes the string.                 |
 
 ### Stack Manipulation
-| Name   | Operation                            | 
-|--------|--------------------------------------|
-| `dup`  | Pops a value and pushes it twice.    |
-| `drop` | Pops a value, discarding it.         |
-| `swap` | Swaps the top 2 values on the stack. |
+| Name   | Operation                                               | 
+|--------|---------------------------------------------------------|
+| `dup`  | Pops a value and pushes it twice.                       |
+| `drop` | Pops a value, discarding it.                            |
+| `swap` | Pops two values and pushes them back in reverse order.  |
 
 ### Boolean Logic
 | Name  | Operation                                                              |
@@ -66,13 +153,13 @@ Comments must start and end with a ``/``
 | `xor` | Pops two booleans, computes their logical exclusive-OR, and pushes it. |
 
 ### Comparisons
-| Name  | Operation                                                                                                 |
-|-------|-----------------------------------------------------------------------------------------------------------|
-| `eq`  | Pops two values, checks if the first one equals the second, and pushes the result.                        |
-| `gt`  | Pops two values, checks if the first one is greater than the second, and pushes the result.             |
-| `lt`  | Pops two values, checks if the first one is less than the second, and pushes the result.                |
-| `gte` | Pops two values, checks if the first one is greater than or equal to the second, and pushes the result. |
-| `lte` | Pops two values, checks if the first one is less than or equal to the second, and pushes the result.    |
+| Name  | Operation                                                                                               |
+|-------|---------------------------------------------------------------------------------------------------------|
+| `eq`  | Pops two values, checks if the econd one equals the first, and pushes the result.                       |
+| `gt`  | Pops two values, checks if the second one is greater than the first, and pushes the result.             |
+| `lt`  | Pops two values, checks if the second one is less than the first, and pushes the result.                |
+| `gte` | Pops two values, checks if the second one is greater than or equal to the first, and pushes the result. |
+| `lte` | Pops two values, checks if the second one is less than or equal to the first, and pushes the result.    |
 
 ### Conversions
 | Name     | Operation                                                      |
