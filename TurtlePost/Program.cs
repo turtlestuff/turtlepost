@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.IO;
+using TurtlePost.Localization;
 
 namespace TurtlePost
 {
@@ -14,16 +15,16 @@ namespace TurtlePost
         {
             if (args.Length == 0)
             {
-                Console.WriteLine($"TurtlePost Blueprint {Assembly.GetExecutingAssembly().GetName().Version}");
-                Console.WriteLine("By Vrabbers and Reflectronic, (c) 2019");
-                Console.WriteLine("Type help for a list of operations");
+                Console.WriteLine(string.Format(Resources.Version, Assembly.GetExecutingAssembly().GetName().Version));
+                Console.WriteLine(Resources.Copyright);
+                Console.WriteLine(Resources.Help);
                 var directInterpreter = new Interpreter();
 
                 while (true)
                 {
                     Console.Write("> ");
                     var toInterpret = Console.ReadLine();
-                    Resources.
+                    
                     if (toInterpret == null)
                     {
                         toInterpret = "exit";
