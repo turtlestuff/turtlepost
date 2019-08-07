@@ -21,9 +21,15 @@ namespace TurtlePost
 
                 while (true)
                 {
-                    Console.Write(">");
+                    Console.Write("> ");
                     var toInterpret = Console.ReadLine();
-
+                    Resources.
+                    if (toInterpret == null)
+                    {
+                        toInterpret = "exit";
+                        Console.Write(toInterpret);
+                    }
+                    
                     directInterpreter.Interpret(toInterpret,true);
                 }
             } 
