@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Linq;
 using System.Text.Json;
@@ -8,15 +9,17 @@ namespace TurtlePost
 {
     public static class I18n
     {
-        static Dictionary<string, string> strings = new Dictionary<string, string>();
+        static readonly ImmutableDictionary<string, string> Localizations;
         
         static I18n()
         {
-            InsertResources($"TurtlePost.Localization.{CultureInfo.CurrentUICulture.IetfLanguageTag}.json");
-            InsertResources("TurtlePost.Localization.en-US.json");
+            var dict = new Dictionary<string, string>();
+            InsertResources($"TurtlePost.Localization.{CultureInfo.CurrentUICulture.IetfLanguageTag}.json", dict);
+            InsertResources("TurtlePost.Localization.en-US.json", dict);
+            Localizations = dict.ToImmutableDictionary();
         }
 
-        static void InsertResources(string manifestResourceName) 
+        static void InsertResources(string manifestResourceName, Dictionary<string, string> dict) 
         {
             var resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(manifestResourceName);
             
@@ -27,16 +30,16 @@ namespace TurtlePost
             else
             {
                 var englishStrings = JsonDocument.Parse(resourceStream).RootElement;
-                foreach (var prop in englishStrings.EnumerateObject().Where(prop => !strings.ContainsKey(prop.Name)))
+                foreach (var prop in englishStrings.EnumerateObject().Where(prop => !dict.ContainsKey(prop.Name)))
                 {
-                    strings.Add(prop.Name, prop.Value.GetString());
+                    dict.Add(prop.Name, prop.Value.GetString());
                 }
             }
         }
         
         public static string _(string key)
         {
-            return strings.ContainsKey(key) ? strings[key] : key;
+            return Localizations.ContainsKey(key) ? Localizations[key] : key;
         }
     }
 }
