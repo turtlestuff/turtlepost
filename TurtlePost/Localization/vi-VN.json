@@ -3,7 +3,7 @@
     "version": "TurtlePost Phiên Bản {0}",
     "exit": "Gõ phím bất kỳ để thoát...",
     "exitExplanation": "Để thoát TurtlePost, gõ CTRL+D hoặc sử dụng lệnh exit.",
-    "copying": "Ứng dụng này là phần mềm tự do và không có BẢO HÀNH NÀO. Bạn có thể chia sẻ ứng dụng này theo điều khoản nhất định; gõ 'copying' để xem chi tiết.",
+    "copying": "Ứng dụng này là phần mềm tự do và không có BẢO HÀNH NÀO. Bạn có thể chia sẻ ứng dụng này theo điều khoản nhất định; gõ 'copying' để xem chi tiết.",
     "copyingNotice": "Ứng dụng này là phần mềm tự do: bạn có thể chia sẻ hoặc thay đổi nó theo điều khoản của Giấy phép công cộng GNU hạn chế được xuất bởi Free Software Foundation, phiên bản 3, hoặc (theo tùy chọn của bạn) bất kỳ phiên bản mới hơn.",
     "warrantyNotice": "Ứng dụng này bị chia sẻ với hy vọng nó sẽ hữu ích, mà KHÔNG CÓ BẢO HÀNH NÀO; vẫn không bảo hành ngụ ý cho CHẤT LƯỢNG hoặc PHÙ HỢP CHO MỘT MỤC ĐÍCH.  Xem Giấy phép công cộng GNU hạn chế để biết thêm chi tiết.",
     "licenseNotice": "Bạn nên nhận được một bản Giấy phép công cộng GNU hạn chế với ứng dụng này.  Nếu không, xem <https://www.gnu.org/licenses/>."
