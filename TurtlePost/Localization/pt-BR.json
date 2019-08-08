@@ -2,5 +2,9 @@
     "help": "Digite help para uma lista de operações",
     "version": "TurtlePost Versão {0}",
     "exit": "Pressione qualquer tecla para continuar...",
-    "exitExplanation": "Para sair do TurtlePost, apete CTRL+D ou use a operação exit."
+    "exitExplanation": "Para sair do TurtlePost, apete CTRL+D ou use a operação exit.",
+    "copying": "Esse programa é software livre e vem SEM NEHUMA GARANTIA. Você pode redistribuí-lo dentro de certas condições; digite 'copying' para mais detalhes.",
+    "copyingNotice": "Este programa é software livre; você pode redistribuí-lo e/ou modificá-lo sob os termos da Licença Pública Geral Menor GNU conforme publicada pela Free Software Foundation; tanto a versão 3 da Licença, ou (a seu critério) qualquer versão posterior.",
+    "warrantyNotice": "Este programa é distribuído na expectativa de que seja útil, porém, SEM NENHUMA GARANTIA; nem mesmo a garantia implícita de COMERCIABILIDADE ou ADEQUAÇÃO A UMA FINALIDADE ESPECÍFICA. Consulte a Licença Pública Geral Menor GNU para mais detalhes.",
+    "licenseNotice": "Você deve ter recebido uma cópia da Licença Publica Geral Menor GNU junto a esse programa. Caso contrário, vá para <https://www.gnu.org/licenses/>."
 }
