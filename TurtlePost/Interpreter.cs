@@ -40,6 +40,9 @@ namespace TurtlePost
             { "write",   WriteOperation.Instance },
             { "push",    PushOperation.Instance },
 
+            // Strings
+            { "concat",  ConcatOperation.Instance },
+
             // I/O
             { "print",   PrintOperation.Instance },
             { "println", PrintLineOperation.Instance },
@@ -49,6 +52,8 @@ namespace TurtlePost
             { "dup",     DuplicateOperation.Instance },
             { "drop",    DropOperation.Instance  },
             { "swap",    SwapOperation.Instance },
+            { "over",    OverOperation.Instance },
+
 
             // Boolean logic
             { "not",     NotOperation.Instance },

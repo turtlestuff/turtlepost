@@ -113,7 +113,7 @@ The `call` operation pops a label, saves the current source location to the *cal
 Note that subroutines will still be executed as normal code if the interpreter reaches the subroutine's code. Since the call stack would be empty at this point, the `ret` operation would cause an error. Thus, it is advised to place all subroutines after an `@end jump` at the end of the file, so that the interpreter does not attempt to run subroutines with an empty call stack.
 
 ## Operations Reference
-`add sub mul div mod write push print println input dup drop swap not and or xor eq gt lt gte lte string parse jump call jumpif callif ret exit nop help`
+`add sub mul div mod write push concat print println input dup drop swap over not and or xor eq gt lt gte lte string parse jump call jumpif callif ret exit nop help copying`
 
 ### Math
 | Name  | Operation                                                                                                    |
@@ -130,6 +130,11 @@ Note that subroutines will still be executed as normal code if the interpreter r
 | `write` | Pops a global and any value, and writes the value into the global. |
 | `push`  | Pops a global and pushes the value of the global.                  |
 
+### Strings
+| Name     | Operation                      |
+|----------|--------------------------------|
+| `concat` | Pops two strings, concats them |
+
 ### I/O
 | Name      | Operation                                                                           |
 |-----------|-------------------------------------------------------------------------------------|
@@ -143,6 +148,7 @@ Note that subroutines will still be executed as normal code if the interpreter r
 | `dup`  | Pops a value and pushes it twice.                       |
 | `drop` | Pops a value, discarding it.                            |
 | `swap` | Pops two values and pushes them back in reverse order.  |
+| `over` | x \| y -> x \| y \| x (how do i explain this?)          |
 
 ### Boolean Logic
 | Name  | Operation                                                              |
