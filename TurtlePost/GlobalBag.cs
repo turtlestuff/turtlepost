@@ -20,7 +20,7 @@ namespace TurtlePost
                 }
 
                 // Create new global
-                var nameStr = name.ToString();
+                var nameStr = name;
                 global = new Global(nameStr);
                 GlobalDictionary.Add(nameStr, global);
                 return global;

@@ -177,8 +177,9 @@ Note that subroutines will still be executed as normal code if the interpreter r
 | `ret`    | Pops the previous source location from the call stack and unconditionally transfers control to source starting at that location.                  |
 
 ### Miscellaneous
-| Name   | Operation                                                                 |
-|--------|---------------------------------------------------------------------------|
-| `exit` | Exits the process the interpreter is running in with exit code 0.         |
-| `nop`  | Performs no operation.                                                    |
-| `help` | Prints out a list of all operations the interpreter is configured to use. |
+| Name      | Operation                                                                           |
+|-----------|-------------------------------------------------------------------------------------|
+| `exit`    | Exits the process the interpreter is running in with exit code 0.                   |
+| `nop`     | Performs no operation.                                                              |
+| `help`    | Prints out a list of all operations the interpreter is configured to use.           |
+| `copying` | Prints out information about redistribution, warranty, and licensing of TurtlePost. |

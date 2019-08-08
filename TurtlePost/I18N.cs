@@ -7,18 +7,21 @@ using System.Text.Json;
 
 namespace TurtlePost
 {
-    public static class I18n
+    public class I18N
     {
-        static readonly ImmutableDictionary<string, string> Localizations;
-        
-        static I18n()
+        I18N()
         {
             var dict = new Dictionary<string, string>();
-            InsertResources($"TurtlePost.Localization.{CultureInfo.CurrentUICulture.IetfLanguageTag}.json", dict);
+            InsertResources($"TurtlePost.Localization.{CultureInfo.CurrentUICulture.Name}.json", dict);
             InsertResources("TurtlePost.Localization.en-US.json", dict);
             Localizations = dict.ToImmutableDictionary();
         }
-
+        
+        public static I18N TR { get; } = new I18N();
+        public string this[string key] => Localizations.ContainsKey(key) ? Localizations[key] : key;
+        
+        readonly ImmutableDictionary<string, string> Localizations; 
+        
         static void InsertResources(string manifestResourceName, Dictionary<string, string> dict) 
         {
             var resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(manifestResourceName);
@@ -35,11 +38,6 @@ namespace TurtlePost
                     dict.Add(prop.Name, prop.Value.GetString());
                 }
             }
-        }
-        
-        public static string _(string key)
-        {
-            return Localizations.ContainsKey(key) ? Localizations[key] : key;
         }
     }
 }

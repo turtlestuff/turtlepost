@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
-using static TurtlePost.I18n;
+using static TurtlePost.I18N;
 
 namespace TurtlePost
 {
@@ -11,9 +11,10 @@ namespace TurtlePost
         {
             if (args.Length == 0)
             {
-                Console.WriteLine(_("versionString"), Assembly.GetExecutingAssembly().GetName().Version + " 🐢");
-                Console.WriteLine("By Vrabbers and Reflectronic, (c) 2019");
-                Console.WriteLine(_("helpPrompt"));
+                Console.WriteLine(TR["version"], Assembly.GetExecutingAssembly().GetName().Version + " 🐢");
+                Console.WriteLine("(C) 2019 Vrabbers, Reflectronic");
+                Console.WriteLine(TR["copying"]);
+                Console.WriteLine(TR["help"]);
 
                 // Set up the console
                 Console.TreatControlCAsInput = true;
@@ -50,7 +51,7 @@ namespace TurtlePost
                 var code = File.ReadAllText(args[0]);
                 new Interpreter().Interpret(code, false);
                 Console.WriteLine();
-                Console.WriteLine(_("exitPrompt"));
+                Console.WriteLine(TR["exit"]);
                 Console.ReadKey();
             }
         }

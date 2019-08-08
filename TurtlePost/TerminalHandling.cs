@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Text;
-using static TurtlePost.I18n;
+using static TurtlePost.I18N;
 
 namespace TurtlePost
 {
@@ -23,7 +23,7 @@ namespace TurtlePost
         }
 
         static Interpreter DirectInterpreter;
-        static bool InputComplete = false;
+        static bool InputComplete;
         static StringBuilder CurrentInput = new StringBuilder(256);
 
         static ImmutableDictionary<KeyPressed, Action> Keys = new Dictionary<KeyPressed, Action>
@@ -77,7 +77,7 @@ namespace TurtlePost
                     if (CurrentInput.Length == 0)
                     {
                         //Print a message stating how to exit
-                        Console.WriteLine(_("exitExplanation"));
+                        Console.WriteLine(TR["exitExplanation"]);
                     }
 
                     InputComplete = true;
