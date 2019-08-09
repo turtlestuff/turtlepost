@@ -32,7 +32,7 @@ namespace TurtlePost
             var resources = typeof(I18N).Assembly.GetManifestResourceNames();
             string? resourceName = default;
 
-            while (culture != null)
+            while (!culture.Equals(CultureInfo.InvariantCulture))
             {
                 var res = $"TurtlePost.Localization.{culture}";
                 if (resources.Contains(res))
