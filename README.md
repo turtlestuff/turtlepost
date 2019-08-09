@@ -113,16 +113,19 @@ The `call` operation pops a label, saves the current source location to the *cal
 Note that subroutines will still be executed as normal code if the interpreter reaches the subroutine's code. Since the call stack would be empty at this point, the `ret` operation would cause an error. Thus, it is advised to place all subroutines after an `@end jump` at the end of the file, so that the interpreter does not attempt to run subroutines with an empty call stack.
 
 ## Operations Reference
-`add sub mul div mod write push concat print println input dup drop swap over not and or xor eq gt lt gte lte string parse jump call jumpif callif ret exit nop help copying`
+`add sub mul div mod round floor ceil write push concat print println input dup drop swap over not and or xor eq gt lt gte lte string parse jump call jumpif callif ret exit nop help copying`
 
 ### Math
-| Name  | Operation                                                                                                    |
-|-------|--------------------------------------------------------------------------------------------------------------|
-| `add` | Pops two values, adds the first to the second, and pushes the resulting sum.                                 |
-| `sub` | Pops two values, subtracts the first from the second, and pushes the resulting difference.                   |
-| `mul` | Pops two values, multiplies the first by the second, and pushes the resulting product.                       |
-| `div` | Pops two values, divides the first by the second, and pushes the resulting quotient.                         |
-| `mod` | Pops two values, divides the first by the second, and pushes the resulting remainder.                        |
+| Name    | Operation                                                                                                    |
+|---------|--------------------------------------------------------------------------------------------------------------|
+| `add`   | Pops two values, adds the first to the second, and pushes the resulting sum.                                 |
+| `sub`   | Pops two values, subtracts the first from the second, and pushes the resulting difference.                   |
+| `mul`   | Pops two values, multiplies the first by the second, and pushes the resulting product.                       |
+| `div`   | Pops two values, divides the first by the second, and pushes the resulting quotient.                         |
+| `mod`   | Pops two values, divides the first by the second, and pushes the resulting remainder.                        |
+| `round` | Rounds the top value on the stack.                                                                           |
+| `floor` | Rounds the top value on the stack down.                                                                      |
+| `ceil`  | Rounds the top value on the stack up.                                                                        |
 
 ### Globals
 | Name    | Operation                                                          |

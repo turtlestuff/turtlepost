@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using TurtlePost.Operations;
 using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
+using TurtlePost.Api.Operations;
 
 namespace TurtlePost
 {
@@ -35,7 +36,10 @@ namespace TurtlePost
             { "mul",     MultiplyOperation.Instance },
             { "div",     DivideOperation.Instance },
             { "mod",     ModuloOperation.Instance },
-            
+            { "round",   RoundOperation.Instance },
+            { "floor",   FloorOperation.Instance },
+            { "ceil",    CeilingOperation.Instance },
+
             // Globals
             { "write",   WriteOperation.Instance },
             { "push",    PushOperation.Instance },
