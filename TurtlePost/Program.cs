@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using static TurtlePost.I18N;
@@ -9,10 +10,13 @@ namespace TurtlePost
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("uk-UA");
             if (args.Length == 0)
             {
-                Console.WriteLine(TR["version"], Assembly.GetExecutingAssembly().GetName().Version + " 🐢");
+                Console.WriteLine(TR["version"],
+                    typeof(Interpreter).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+                        .InformationalVersion);
+                
                 Console.WriteLine("(C) 2019 Vrabbers, Reflectronic");
                 Console.WriteLine(TR["copying"]);
                 Console.WriteLine(TR["help"]);

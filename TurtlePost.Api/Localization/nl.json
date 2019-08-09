@@ -2,10 +2,9 @@
     "help": "Typ 'help' voor een lijst van acties.",
     "version": "TurtlePost versie {0}",
     "exit": "Druk op een toets om af te sluiten.",
-    "exitExplanation": "Om TurtlePost af te sluiten, druk op CTRL+D of gebruik de actie 'exit'",
+    "exitExplanation": "Om TurtlePost af te sluiten, druk op CTRL+D of gebruik de actie 'exit'.",
     "copying": "Dit programma is vrije software en komt met ABSOLUUT GEEN GARANTIE. Redistribueren mag onder voorwaarde, typ 'copying' voor meer informatie.",
     "copyingNotice": "Dit programma is vrije software: redistributie of modificatie is mogelijk onder de voorwaarden van de GNU Lesser General Public License, zoals gepubliceerd door de Free Software Foundation, versie 3 van de License, of mogelijk een latere versie.",
     "warrantyNotice": "Dit programma wordt uitgegeven met het doel nuttig te zijn, maar ZONDER ENIGE VORM VAN GARANTIE. Bekijk de GNU General Public License voor meer informatie.",
-    "licenseNotice": "Dit programma komt met een kopie van de GNU Lesser General Public License. Als dit niet het geval is, ga naar <https;//www.gnu.org/licenses/>."
+    "licenseNotice": "Dit programma komt met een kopie van de GNU Lesser General Public License. Als dit niet het geval is, ga naar <https://www.gnu.org/licenses/>."
 }
-//these translations were made by JelleTheWhale. thanks!
