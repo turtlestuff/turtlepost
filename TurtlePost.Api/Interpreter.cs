@@ -51,6 +51,10 @@ namespace TurtlePost
             { "print",   PrintOperation.Instance },
             { "println", PrintLineOperation.Instance },
             { "input",   InputOperation.Instance },
+            { "cls",     ClearOperation.Instance },
+            { "width",   WidthOperation.Instance },
+            { "height",  HeightOperation.Instance },
+            { "cursor",  CursorOperation.Instance },
 
             // Stack manipulation
             { "dup",     DuplicateOperation.Instance },
