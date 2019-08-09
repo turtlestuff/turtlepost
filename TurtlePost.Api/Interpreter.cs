@@ -39,6 +39,9 @@ namespace TurtlePost
             { "round",   RoundOperation.Instance },
             { "floor",   FloorOperation.Instance },
             { "ceil",    CeilingOperation.Instance },
+            { "sin",     SineOperation.Instance },
+            { "cos",     CosineOperation.Instance },
+            { "tan",     TangentOperation.Instance },
 
             // Globals
             { "write",   WriteOperation.Instance },

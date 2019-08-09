@@ -113,7 +113,7 @@ The `call` operation pops a label, saves the current source location to the *cal
 Note that subroutines will still be executed as normal code if the interpreter reaches the subroutine's code. Since the call stack would be empty at this point, the `ret` operation would cause an error. Thus, it is advised to place all subroutines after an `@end jump` at the end of the file, so that the interpreter does not attempt to run subroutines with an empty call stack.
 
 ## Operations Reference
-`add sub mul div mod round floor ceil write push concat print println input cls width height cursor dup drop swap over not and or xor eq gt lt gte lte string parse jump call jumpif callif ret exit nop help copying`
+`add sub mul div mod round floor ceil sin cos tan write push concat print println input cls width height cursor dup drop swap over not and or xor eq gt lt gte lte string parse jump call jumpif callif ret exit nop help copying`
 
 ### Math
 | Name    | Operation                                                                                                    |
@@ -126,6 +126,9 @@ Note that subroutines will still be executed as normal code if the interpreter r
 | `round` | Rounds the top value on the stack.                                                                           |
 | `floor` | Rounds the top value on the stack down.                                                                      |
 | `ceil`  | Rounds the top value on the stack up.                                                                        |
+| `sin`   | Pops a value, pushes its sine.                                                                               |
+| `cos`   | Pops a value, pushes its cosine.                                                                             |
+| `tan`   | Pops a value, pushes its tangent.                                                                            |
 
 ### Globals
 | Name    | Operation                                                          |
