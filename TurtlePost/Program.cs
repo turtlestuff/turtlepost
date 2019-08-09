@@ -10,7 +10,6 @@ namespace TurtlePost
     {
         static void Main(string[] args)
         {
-            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("uk-UA");
             if (args.Length == 0)
             {
                 Console.WriteLine(TR["version"],
