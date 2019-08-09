@@ -189,3 +189,11 @@ Note that subroutines will still be executed as normal code if the interpreter r
 | `nop`     | Performs no operation.                                                              |
 | `help`    | Prints out a list of all operations the interpreter is configured to use.           |
 | `copying` | Prints out information about redistribution, warranty, and licensing of TurtlePost. |
+
+## Localizations
+A special thanks for these folks for translating TurtlePost:\
+Esperanto - Astro\
+Dutch - JelleTheWhale\
+Portuguese - Vrabbers\
+Ukranian - Reflectronic\
+Vietnamese - Victor Tran\
