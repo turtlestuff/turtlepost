@@ -196,4 +196,4 @@ Esperanto - Astro\
 Dutch - JelleTheWhale\
 Portuguese - Vrabbers\
 Ukranian - Reflectronic\
-Vietnamese - Victor Tran\
+Vietnamese - Victor Tran
