@@ -15,4 +15,4 @@ namespace TurtlePost
             Position = position;
         }
     }
-    }
+}

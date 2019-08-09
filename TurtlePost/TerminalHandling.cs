@@ -49,7 +49,9 @@ namespace TurtlePost
                 {
                     //Interpret the current line
                     Console.WriteLine();
-                    DirectInterpreter.Interpret(CurrentInput.ToString(), true);
+                    if (CurrentInput.Length != 0) 
+                        DirectInterpreter.Interpret(CurrentInput.ToString(), true);
+                    
                     InputComplete = true;
                 }
             },

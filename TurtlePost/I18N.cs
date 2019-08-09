@@ -14,13 +14,13 @@ namespace TurtlePost
             var dict = new Dictionary<string, string>();
             InsertResources($"TurtlePost.Localization.{CultureInfo.CurrentUICulture.Name}.json", dict);
             InsertResources("TurtlePost.Localization.en-US.json", dict);
-            Localizations = dict.ToImmutableDictionary();
+            localizations = dict.ToImmutableDictionary();
         }
         
         public static I18N TR { get; } = new I18N();
-        public string this[string key] => Localizations.ContainsKey(key) ? Localizations[key] : key;
-        
-        readonly ImmutableDictionary<string, string> Localizations; 
+        public string this[string key] => localizations.ContainsKey(key) ? localizations[key] : key;
+
+        readonly ImmutableDictionary<string, string> localizations; 
         
         static void InsertResources(string manifestResourceName, Dictionary<string, string> dict) 
         {

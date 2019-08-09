@@ -9,6 +9,7 @@ namespace TurtlePost
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
             if (args.Length == 0)
             {
                 Console.WriteLine(TR["version"], Assembly.GetExecutingAssembly().GetName().Version + " 🐢");
@@ -32,9 +33,7 @@ namespace TurtlePost
                         {
                             func();
                         }
-                        //that comment i found to be unnecessary on windows. i don't know about linux or mac, so i left it there,
-                        //if it turns out to be necessary, just uncomment it.
-                        else if (/*(key.Modifiers & ConsoleModifiers.Control) != 0 && */!char.IsControl(key.KeyChar))
+                        else if (!char.IsControl(key.KeyChar))
                         {
                             Console.Write(key.KeyChar);
                             CurrentInput.Append(key.KeyChar);

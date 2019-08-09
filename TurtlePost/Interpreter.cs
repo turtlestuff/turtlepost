@@ -141,7 +141,7 @@ namespace TurtlePost
             sw.Stop();
             Utils.PrintGlobals(globals);
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("Execution time: {0}ms", sw.ElapsedMilliseconds);
+            Console.WriteLine("Execution time: {0}ms", sw.Elapsed.TotalMilliseconds);
             Console.ResetColor();
 #endif
             if (printStack)
