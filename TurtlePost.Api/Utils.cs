@@ -75,13 +75,11 @@ namespace TurtlePost
                 WriteFormatted(o);
 
                 if (i != 0)
-                {
                     // Do not write separator if this is the last item
                     Console.Write(" | ");
-                }
+                else
+                    Console.WriteLine();
             }
-
-            Console.WriteLine();
         }
     }
 }

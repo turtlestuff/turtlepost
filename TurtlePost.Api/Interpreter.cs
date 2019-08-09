@@ -92,14 +92,17 @@ namespace TurtlePost
         
         readonly GlobalBag globals = new GlobalBag();
 
-        public void Interpret(string code, bool printStack)
+        public void Interpret(string code, bool printOutput)
         {
 #if DEBUG
-            var sw = Stopwatch.StartNew();
+            Stopwatch sw = default!;
+            if (printOutput) 
+                sw = Stopwatch.StartNew();
 #endif
             SetupInterpreter(code);
 #if DEBUG
-            Utils.PrintLabels(labels);
+            if (printOutput)
+                Utils.PrintLabels(labels);
 #endif
             try
             {
@@ -141,23 +144,22 @@ namespace TurtlePost
                 Console.ResetColor();
                 UserStack.Clear();
             }
-
-#if DEBUG
-            sw.Stop();
-            Utils.PrintGlobals(globals);
-            Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("Execution time: {0}ms", sw.Elapsed.TotalMilliseconds);
-            Console.ResetColor();
-#endif
-            if (printStack)
+            
+            if (printOutput)
             {
+#if DEBUG
+                sw.Stop();
+                Utils.PrintGlobals(globals);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("Execution time: {0}ms", sw.Elapsed.TotalMilliseconds);
+                Console.ResetColor();
+#endif
                 Utils.PrintStack(UserStack);
                 labels.Clear();
                 CallStack.Clear();
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void SetupInterpreter(string code)
         {
             Enumerator = new MovableStringEnumerator(code);

@@ -191,9 +191,9 @@ Note that subroutines will still be executed as normal code if the interpreter r
 | `copying` | Prints out information about redistribution, warranty, and licensing of TurtlePost. |
 
 ## Localizations
-A special thanks for these folks for translating TurtlePost:\
-Esperanto - Astro\
-Dutch - JelleTheWhale\
-Portuguese - Vrabbers\
-Ukranian - Reflectronic\
-Vietnamese - Victor Tran
+A special thanks for these folks for translating TurtlePost:
+- **Esperanto** - Astro
+- **Dutch** - JelleTheWhale
+- **Portuguese** - [Vrabbers](https://github.com/Vrabbers)
+- **Ukranian** - [John Tur](https://github.com/reflectronic)
+- **Vietnamese** - [Victor Tran](https://github.com/vicr123)
