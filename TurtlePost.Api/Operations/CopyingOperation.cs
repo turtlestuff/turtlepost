@@ -16,7 +16,9 @@ namespace TurtlePost.Operations
         public override void Operate(Interpreter interpreter)
         {
             Console.WriteLine(TR["copyingNotice"]);
+            Console.WriteLine();
             Console.WriteLine(TR["warrantyNotice"]);
+            Console.WriteLine();
             Console.WriteLine(TR["licenseNotice"]);
         }
     }
