@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
+﻿using System.Globalization;
+using static TurtlePost.I18N;
 
 namespace TurtlePost.Operations
 {
@@ -13,10 +11,16 @@ namespace TurtlePost.Operations
 
         public static ParseOperation Instance { get; } = new ParseOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            var value = (string) interpreter.UserStack.Pop()!;
-            interpreter.UserStack.Push(double.Parse(value, CultureInfo.InvariantCulture));
+            if (!interpreter.TryPopA<string>(ref diagnostic, out var str)) return;
+            if (!double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out var number))
+            {
+                diagnostic = new Diagnostic(TR["TP0010", str], "TP0010", DiagnosticType.Error, diagnostic.Span);
+                return;
+            }
+            
+            interpreter.UserStack.Push(number);
         }
     }
 }

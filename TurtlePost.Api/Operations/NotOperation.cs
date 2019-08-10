@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TurtlePost.Operations
 {
-    class NotOperation : Operation
+    class NotOperation : UnaryOperation<bool, bool>
     {
         NotOperation()
         {
@@ -12,10 +12,6 @@ namespace TurtlePost.Operations
 
         public static NotOperation Instance { get; } = new NotOperation();
 
-        public override void Operate(Interpreter interpreter)
-        {
-            var value = (bool) interpreter.UserStack.Pop()!;
-            interpreter.UserStack.Push(!value);
-        }
+        protected override bool Operate(bool value, Interpreter interpreter, ref Diagnostic diagnostic) => !value;
     }
 }

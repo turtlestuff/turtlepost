@@ -11,10 +11,13 @@ namespace TurtlePost.Operations
 
         public static OverOperation Instance { get; } = new OverOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            object? o = interpreter.UserStack.ElementAt(interpreter.UserStack.Count - 1);
-            interpreter.UserStack.Push(o);
+            if (!interpreter.TryPopAny(ref diagnostic, out var top)) return;
+            if (!interpreter.TryPopAny(ref diagnostic, out var bottom)) return;
+            interpreter.UserStack.Push(bottom);
+            interpreter.UserStack.Push(top);
+            interpreter.UserStack.Push(bottom);
         }
     }
 }

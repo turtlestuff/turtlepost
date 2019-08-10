@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Globalization;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Text;
 using TurtlePost.Operations;
 using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
+using static TurtlePost.I18N;
 
 namespace TurtlePost
 {
@@ -92,14 +89,35 @@ namespace TurtlePost
         
         readonly GlobalBag globals = new GlobalBag();
 
+        bool CheckError(in Diagnostic d)
+        {
+            switch (d.DiagnosticType)
+            {
+                case DiagnosticType.Error:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("{0} {1}: {2} ['", TR["error"], d.Id, d.Message);
+                    Console.Out.Write(d.Span);
+                    Console.WriteLine("', {0} {1}]", TR["pos"],
+                        (d.SourceLocation ?? Enumerator.Position - d.Span.Length).ToString());
+                    Console.ResetColor();
+                    UserStack.Clear();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         public void Interpret(string code, bool printOutput)
         {
+            Diagnostic d = default;
 #if DEBUG
             Stopwatch sw = default!;
             if (printOutput) 
                 sw = Stopwatch.StartNew();
 #endif
-            SetupInterpreter(code);
+            SetupInterpreter(code, ref d);
+            if (CheckError(in d)) 
+                return;
 #if DEBUG
             if (printOutput)
                 Utils.PrintLabels(labels);
@@ -115,43 +133,45 @@ namespace TurtlePost
                     {
                         case '&':
                             ReadGlobal();
-                            continue;
+                            break;
                         case '"':
-                            ReadString();
-                            continue;
+                            ReadString(ref d);
+                            break;
                         case '@':
-                            ReadLabel();
-                            continue;
+                            ReadLabel(ref d);
+                            break;
                         case '/':
                             SkipComment();
-                            continue;
+                            break;
                         case '.':
                         case char c when char.IsDigit(c):
-                            ReadNumber();
-                            continue;
+                            ReadNumber(ref d);
+                            break;
                         case char c when char.IsWhiteSpace(c):
-                            continue;
+                            break;
                         default:
-                            ReadOperation()?.Operate(this);
-                            continue;
+                            ReadOperation(ref d)?.Operate(this, ref d);
+                            break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(ex);
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine(TR["internalError"], ex);
                 Console.ResetColor();
                 UserStack.Clear();
             }
-            
+
+            CheckError(in d);
+
             if (printOutput)
             {
 #if DEBUG
                 sw.Stop();
                 Utils.PrintGlobals(globals);
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine("Execution time: {0}ms", sw.Elapsed.TotalMilliseconds);
+                Console.WriteLine(TR["executionTime"], sw.Elapsed.TotalMilliseconds.ToString());
                 Console.ResetColor();
 #endif
                 Utils.PrintStack(UserStack);
@@ -160,7 +180,7 @@ namespace TurtlePost
             }
         }
 
-        void SetupInterpreter(string code)
+        void SetupInterpreter(string code, ref Diagnostic d)
         {
             Enumerator = new MovableStringEnumerator(code);
             Code = code;
@@ -174,9 +194,8 @@ namespace TurtlePost
                 var s = i.Value[1..^1];
                 if (!labels.TryAdd(s, new Label(s, i.Index)))
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Duplicate label found: {0}:{1}", s, i.Index);
-                    Console.ResetColor();
+                    d = new Diagnostic(TR["TP0006"], "TP0006", DiagnosticType.Error, i.Value, i.Index);
+                    return;
                 }
             }
         }

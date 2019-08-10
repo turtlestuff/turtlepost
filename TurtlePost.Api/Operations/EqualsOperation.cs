@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TurtlePost.Operations
 {
-    class EqualsOperation : Operation
+    class EqualsOperation : BinaryOperation<object, object, bool>
     {
         EqualsOperation()
         {
@@ -12,11 +12,7 @@ namespace TurtlePost.Operations
 
         public static EqualsOperation Instance { get; } = new EqualsOperation();
 
-        public override void Operate(Interpreter interpreter)
-        {
-            var v1 = interpreter.UserStack.Pop()!;
-            var v2 = interpreter.UserStack.Pop()!;
-            interpreter.UserStack.Push(v2.Equals(v1));
-        }
+        protected override bool Operate(object top, object bottom, Interpreter interpreter,
+            ref Diagnostic diagnostic) => bottom.Equals(top);
     }
 }

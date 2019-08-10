@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TurtlePost.Operations
 {
-    class AndOperation : Operation
+    class AndOperation : BinaryOperation<bool, bool, bool>
     {
         AndOperation()
         {
@@ -12,11 +12,7 @@ namespace TurtlePost.Operations
 
         public static AndOperation Instance { get; } = new AndOperation();
 
-        public override void Operate(Interpreter interpreter)
-        {
-            var v1 = (bool) interpreter.UserStack.Pop()!;
-            var v2 = (bool) interpreter.UserStack.Pop()!;
-            interpreter.UserStack.Push(v2 && v1);
-        }
+        protected override bool Operate(bool top, bool bottom, Interpreter interpreter,
+            ref Diagnostic diagnostic) => bottom && top;
     }
 }

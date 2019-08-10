@@ -12,10 +12,10 @@ namespace TurtlePost.Operations
 
         public static JumpOperation Instance { get; } = new JumpOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            var label = (Label) interpreter.UserStack.Pop()!;
-            interpreter.Enumerator.TrySetPosition(label.Position - 1);
+            if (!interpreter.TryPopA<Label>(ref diagnostic, out var label)) return;
+            interpreter.Enumerator.Position = label.Position - 1;
         }
     }
 }

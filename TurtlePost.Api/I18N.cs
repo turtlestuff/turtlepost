@@ -36,10 +36,12 @@ namespace TurtlePost
 
                         // Add only new translations to the list. That way, culture-specific translations take precedence
                         // over culture-neutral or invariant culture translations.
-                        foreach (var prop in translations.RootElement.EnumerateObject()
-                            .Where(prop => !dict.ContainsKey(prop.Name)))
+                        foreach (var prop in translations.RootElement.EnumerateObject())
                         {
-                            dict.Add(prop.Name, prop.Value.GetString());
+                            if (!dict.ContainsKey(prop.Name))
+                            {
+                                dict.Add(prop.Name, prop.Value.GetString());
+                            }
                         }
                     }
                 }

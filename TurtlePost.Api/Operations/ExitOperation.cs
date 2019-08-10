@@ -12,7 +12,7 @@ namespace TurtlePost.Operations
 
         public static ExitOperation Instance { get; } = new ExitOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
             Environment.Exit(0);
         }

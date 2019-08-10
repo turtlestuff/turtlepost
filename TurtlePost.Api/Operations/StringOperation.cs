@@ -12,9 +12,10 @@ namespace TurtlePost.Operations
 
         public static StringOperation Instance { get; } = new StringOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            interpreter.UserStack.Push(interpreter.UserStack.Pop()!.ToString());
+            if (!interpreter.TryPopAny(ref diagnostic, out var value)) return;
+            interpreter.UserStack.Push(value?.ToString() ?? string.Empty);
         }
     }
 }

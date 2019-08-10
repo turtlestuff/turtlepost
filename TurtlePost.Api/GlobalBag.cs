@@ -8,7 +8,6 @@ namespace TurtlePost
     {
         public Dictionary<string, Global> GlobalDictionary { get; } = new Dictionary<string, Global>();
 
-        // TODO: Figure out allocation neutral way to do this
         public Global this[string name]
         {
             get

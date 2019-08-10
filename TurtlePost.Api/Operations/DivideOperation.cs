@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TurtlePost.Operations
 {
-    class DivideOperation : Operation
+    class DivideOperation : BinaryOperation<double, double, double>
     {
         DivideOperation()
         {
@@ -12,11 +12,7 @@ namespace TurtlePost.Operations
 
         public static DivideOperation Instance = new DivideOperation();
 
-        public override void Operate(Interpreter interpreter)
-        {
-            var v1 = (double) interpreter.UserStack.Pop()!;
-            var v2 = (double) interpreter.UserStack.Pop()!;
-            interpreter.UserStack.Push(v2 / v1);
-        }
+        protected override double Operate(double top, double bottom, Interpreter interpreter,
+            ref Diagnostic diagnostic) => bottom / top;
     }
 }

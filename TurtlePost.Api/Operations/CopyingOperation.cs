@@ -13,7 +13,7 @@ namespace TurtlePost.Operations
 
         public static CopyingOperation Instance { get; } = new CopyingOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
             Console.WriteLine(TR["copyingNotice"]);
             Console.WriteLine();

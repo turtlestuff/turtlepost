@@ -10,7 +10,7 @@ namespace TurtlePost.Operations
 
         public static HelpOperation Instance { get; } = new HelpOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
             Console.WriteLine(string.Join(" ", interpreter.Operations.Keys));
         }

@@ -1,6 +1,5 @@
 namespace TurtlePost
 {
-    // TODO: use readonly struct
     public class Global
     {
         public string Name { get; }

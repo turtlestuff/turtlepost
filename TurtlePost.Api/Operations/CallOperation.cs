@@ -12,11 +12,11 @@ namespace TurtlePost.Operations
 
         public static CallOperation Instance { get; } = new CallOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            var label = (Label) interpreter.UserStack.Pop()!;
+            if (!interpreter.TryPopA<Label>(ref diagnostic, out var label)) return;
             interpreter.CallStack.Push(interpreter.Enumerator.Position);
-            interpreter.Enumerator.TrySetPosition(label.Position-1);
+            interpreter.Enumerator.Position = label.Position - 1;
         }
     }
 }

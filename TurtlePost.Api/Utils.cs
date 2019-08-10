@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
+using static TurtlePost.I18N;
 
 namespace TurtlePost
 {
@@ -12,8 +13,10 @@ namespace TurtlePost
             if (labels.Any())
             {
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write("Labels: ");
-                Console.WriteLine(string.Join(" | ", labels.Select(p => $"@{p.Key} -> {p.Value.Position.ToString()}")));
+                Console.Write(TR["labels"]);
+                Console.Write(" ");
+                Console.WriteLine(string.Join(" | ", 
+                    labels.Select(p => $"@{p.Key} -> {p.Value.Position.ToString()}")));
                 Console.ResetColor();
             }
         }
@@ -23,8 +26,10 @@ namespace TurtlePost
             if (globals.GlobalDictionary.Any())
             {
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write("Globals: ");
-                Console.WriteLine(string.Join(" | ", globals.GlobalDictionary.Select(p => $"&{p.Key} = {p.Value.Value ?? "null"}")));
+                Console.Write(TR["globals"]);
+                Console.Write(" ");
+                Console.WriteLine(string.Join(" | ",
+                    globals.GlobalDictionary.Select(p => $"&{p.Key} = {p.Value.Value ?? "null"}")));
                 Console.ResetColor();
             }
         }

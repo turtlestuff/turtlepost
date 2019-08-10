@@ -10,12 +10,12 @@ namespace TurtlePost.Operations
 
         public static SwapOperation Instance { get; } = new SwapOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            object? val1 = interpreter.UserStack.Pop();
-            object? val2 = interpreter.UserStack.Pop();
-            interpreter.UserStack.Push(val1);
-            interpreter.UserStack.Push(val2);
+            if (!interpreter.TryPopAny(ref diagnostic, out var top)) return;
+            if (!interpreter.TryPopAny(ref diagnostic, out var bottom)) return;
+            interpreter.UserStack.Push(top);
+            interpreter.UserStack.Push(bottom);
         }
     }
 }

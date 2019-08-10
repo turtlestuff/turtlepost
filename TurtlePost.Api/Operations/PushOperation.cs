@@ -12,9 +12,9 @@ namespace TurtlePost.Operations
 
         public static PushOperation Instance { get; } = new PushOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            var global = (Global) interpreter.UserStack.Pop()!;
+            if (!interpreter.TryPopA<Global>(ref diagnostic, out var global)) return;
             interpreter.UserStack.Push(global.Value);
         }
     }

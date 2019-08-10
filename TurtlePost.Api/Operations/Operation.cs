@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TurtlePost
+namespace TurtlePost.Operations
 {
     public abstract class Operation
     {
-        public abstract void Operate(Interpreter interpreter);
+        public abstract void Operate(Interpreter interpreter, ref Diagnostic diagnostic);
     }
 }

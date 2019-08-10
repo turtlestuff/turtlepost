@@ -12,9 +12,9 @@ namespace TurtlePost.Operations
 
         public static DropOperation Instance { get; } = new DropOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            interpreter.UserStack.Pop();
+            interpreter.TryPopAny(ref diagnostic, out _);
         }
     }
 }

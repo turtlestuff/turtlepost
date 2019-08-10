@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TurtlePost.Operations
 {
-    class SubOperation : Operation
+    class SubOperation : BinaryOperation<double, double, double>
     {
         SubOperation()
         {
@@ -12,11 +12,7 @@ namespace TurtlePost.Operations
 
         public static SubOperation Instance { get; } = new SubOperation();
 
-        public override void Operate(Interpreter interpreter)
-        {
-            var v2 = (double) interpreter.UserStack.Pop()!;
-            var v1 = (double) interpreter.UserStack.Pop()!;
-            interpreter.UserStack.Push(v1 - v2);
-        }
+        protected override double Operate(double top, double bottom, Interpreter interpreter,
+            ref Diagnostic diagnostic) => bottom - top;
     }
 }

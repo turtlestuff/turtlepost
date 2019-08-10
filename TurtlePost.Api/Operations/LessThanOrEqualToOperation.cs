@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TurtlePost.Operations
 {
-    class LessThanOrEqualToOperation : Operation
+    class LessThanOrEqualToOperation : BinaryOperation<double, double, bool>
     {
         LessThanOrEqualToOperation()
         {
@@ -12,11 +12,7 @@ namespace TurtlePost.Operations
 
         public static LessThanOrEqualToOperation Instance { get; } = new LessThanOrEqualToOperation();
 
-        public override void Operate(Interpreter interpreter)
-        {
-            var v1 = (double) interpreter.UserStack.Pop()!;
-            var v2 = (double) interpreter.UserStack.Pop()!;
-            interpreter.UserStack.Push(v2 <= v1);
-        }
+        protected override bool Operate(double top, double bottom, Interpreter interpreter,
+            ref Diagnostic diagnostic) => bottom <= top;
     }
 }

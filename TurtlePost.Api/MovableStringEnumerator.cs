@@ -8,19 +8,19 @@
             Position = position;
         }
 
-        public int Position { get; private set; }
+        int position;
+
+        public int Position
+        {
+            get => position;
+            set
+            {
+                if (value < -1 || value > String.Length) return;
+                position = value;
+            }
+        }
         public string String { get; }
         public char Current => String[Position];
-
         public bool MoveNext() => ++Position < String.Length;
-
-        public bool TrySetPosition(int pos)
-        {
-            if (pos < -1 || pos >= String.Length)
-                return false;
-
-            Position = pos;
-            return true;
-        }
     }
 }

@@ -12,7 +12,7 @@ namespace TurtlePost.Operations
 
         public static NoOperation Instance { get; } = new NoOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
         }
     }

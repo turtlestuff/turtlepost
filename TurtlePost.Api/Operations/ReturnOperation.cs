@@ -11,9 +11,10 @@ namespace TurtlePost.Operations
 
         public static ReturnOperation Instance = new ReturnOperation();
 
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            interpreter.Enumerator.TrySetPosition(interpreter.CallStack.Pop()!);
+            if (!interpreter.TryPopStackFrame(ref diagnostic, out var location)) return;
+            interpreter.Enumerator.Position = location;
         }
     }
 }

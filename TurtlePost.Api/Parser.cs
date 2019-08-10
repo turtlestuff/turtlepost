@@ -3,6 +3,8 @@ using System.Buffers;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
+using TurtlePost.Operations;
+using static TurtlePost.I18N;
 
 namespace TurtlePost
 {
@@ -19,15 +21,22 @@ namespace TurtlePost
             return Code[start..Enumerator.Position];
         }
 
-        void ReadNumber()
+        void ReadNumber(ref Diagnostic d)
         {
             var buffer = ReadToNextDelimiter();
-            UserStack.Push(double.Parse(buffer, provider: CultureInfo.InvariantCulture));
+            if (!double.TryParse(buffer, NumberStyles.Any, CultureInfo.InvariantCulture, out var num))
+            {
+                d = new Diagnostic(TR["TP0007"], "TP0007", DiagnosticType.Error, buffer);
+                return;
+            }
+
+            UserStack.Push(num);
         }
 
-        Operation? ReadOperation()
+        Operation? ReadOperation(ref Diagnostic d)
         {
             var buffer = ReadToNextDelimiter();
+            d.Span = buffer;
             switch (buffer)
             {
                 case var _ when buffer.Equals("true", StringComparison.Ordinal):
@@ -40,11 +49,16 @@ namespace TurtlePost
                     UserStack.Push(null);
                     return null;
                 default:
-                    return Operations[buffer.ToString()];
+                    if (!Operations.TryGetValue(buffer.ToString(), out var op))
+                    {
+                        d = new Diagnostic(TR["TP0004"], "TP0004", DiagnosticType.Error, buffer);
+                    }
+
+                    return op;
             }
         }
 
-        void ReadString()
+        void ReadString(ref Diagnostic d)
         {
             // This function shifts a sub-slice of the buffer to the left a specified amount of times.
             // The sub-slice starts at the given start index and continues to the end (we don't need anything more).
@@ -124,8 +138,15 @@ namespace TurtlePost
                         // 'u' denotes an escape of the form \uXXXX, where XXXX is a UTF-16 code unit in hex. We need
                         // to capture those 4 characters that make up the hex digit, parse it, and reinterpret it as 
                         // a character. 
-                        var utf16CodeUnit = ushort.Parse(buffer[(i + 2)..(i + 6)], NumberStyles.HexNumber,
-                            CultureInfo.InvariantCulture);
+                        if (!ushort.TryParse(buffer[(i + 2)..(i + 6)], NumberStyles.HexNumber,
+                            CultureInfo.InvariantCulture, out var utf16CodeUnit))
+                        {
+                            d = new Diagnostic(TR["TP0008"], "TP0008", DiagnosticType.Error, sourceString, i + 2);
+                            if (rentedArr != null)
+                                ArrayPool<char>.Shared.Return(rentedArr);
+                            return;
+                        }
+                        
                         buffer[i] = (char) utf16CodeUnit;
 
                         // Shift the buffer left 5 to cover up the 'u' and the hex digit. Since we overwrote the
@@ -137,12 +158,18 @@ namespace TurtlePost
                         // hex string to match). Because a UTF-32 code unit may or may not correspond to a UTF-16
                         // surrogate pair, we will have to shift either 8 or 9 characters over, depending on how many
                         // UTF-16 code units we end up writing.
-                        var utf32CodeUnit = uint.Parse(buffer[(i + 2)..(i + 10)], NumberStyles.HexNumber,
-                            CultureInfo.InvariantCulture);
+                        if (!uint.TryParse(buffer[(i + 2)..(i + 10)], NumberStyles.HexNumber, 
+                            CultureInfo.InvariantCulture, out var utf32CodeUnit))
+                        {
+                            d = new Diagnostic(TR["TP0008"], "TP0008", DiagnosticType.Error, sourceString, i + 2);
+                            if (rentedArr != null)
+                                ArrayPool<char>.Shared.Return(rentedArr);
+                            return;
+                        }
 
                         // We will use Encoding to convert a UTF-32 code unit to UTF-16 code units and write it to the 
                         // buffer, starting from the current index (which is the backslash).
-                        
+
                         ReadOnlySpan<byte> bytes;
                         unsafe
                         {
@@ -161,8 +188,10 @@ namespace TurtlePost
                         ShiftBufferSegment(ref buffer, i + 10, 10 - charsWritten);
                         continue;
                     default:
-                        // TODO: Report an error
-                        continue;
+                        d = new Diagnostic(TR["TP0009"], "TP0009", DiagnosticType.Error, sourceString);
+                        if (rentedArr != null)
+                            ArrayPool<char>.Shared.Return(rentedArr);
+                        return;
                 }
 
                 // We have already performed the character escape; however, the character we inserted only replaces
@@ -203,9 +232,8 @@ namespace TurtlePost
             UserStack.Push(globals[buffer.ToString()]);
         }
 
-        void ReadLabel()
+        void ReadLabel(ref Diagnostic d)
         {
-            Enumerator.MoveNext(); // Skip @ character
             var buffer = ReadToNextDelimiter();
             if (buffer[^1] == ':')
             {
@@ -213,7 +241,13 @@ namespace TurtlePost
                 return;
             }
 
-            UserStack.Push(labels[buffer.ToString()]);
+            if (!labels.TryGetValue(buffer[1..].ToString(), out var label))
+            {
+                d = new Diagnostic(TR["TP0005"], "TP0005", DiagnosticType.Error, buffer);
+                return;
+            }
+
+            UserStack.Push(label);
         }
     }
 }

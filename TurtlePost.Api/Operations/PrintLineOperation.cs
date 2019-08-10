@@ -12,9 +12,10 @@ namespace TurtlePost.Operations
 
         public static PrintLineOperation Instance { get; } = new PrintLineOperation();
         
-        public override void Operate(Interpreter interpreter)
+        public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            Console.WriteLine(interpreter.UserStack.Pop());
+            if (!interpreter.TryPopAny(ref diagnostic, out var value)) return;
+            Console.WriteLine(value?.ToString() ?? "null");
         }
     }
 }
