@@ -38,7 +38,7 @@ namespace TurtlePost
             { "round",   RoundOperation.Instance },
             { "floor",   FloorOperation.Instance },
             
-            // Trigonometry
+            // Trigonometric
             { "sin",     SineOperation.Instance },
             { "cos",     CosineOperation.Instance },
             { "tan",     TangentOperation.Instance },

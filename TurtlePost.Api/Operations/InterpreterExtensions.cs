@@ -19,7 +19,8 @@ namespace TurtlePost.Operations
                 return true;
             }
 
-            d = new Diagnostic(TR["TP0003", typeof(T).Name.ToLower(), obj?.GetType().Name.ToLower() ?? "null"],
+            var expectedType = typeof(T) == typeof(double) ? "number" : typeof(T).Name.ToLower();
+            d = new Diagnostic(TR["TP0003", expectedType, obj?.GetType().Name.ToLower() ?? "null"],
                 "TP0003", DiagnosticType.Error, d.Span);
             value = default!;
             return false;
