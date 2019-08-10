@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using TurtlePost.Operations;
-using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
 using static TurtlePost.I18N;
+using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
 
 namespace TurtlePost
 {
@@ -26,13 +26,23 @@ namespace TurtlePost
         
         public Dictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
         {
-            // Math
+            // Arithmetic
             { "add",     AddOperation.Instance },
             { "sub",     SubOperation.Instance },
             { "mul",     MultiplyOperation.Instance },
             { "div",     DivideOperation.Instance },
             { "mod",     ModuloOperation.Instance },
             
+            // Rounding
+            { "ceil",    CeilingOperation.Instance },
+            { "round",   RoundOperation.Instance },
+            { "floor",   FloorOperation.Instance },
+            
+            // Trigonometry
+            { "sin",     SineOperation.Instance },
+            { "cos",     CosineOperation.Instance },
+            { "tan",     TangentOperation.Instance },
+
             // Globals
             { "write",   WriteOperation.Instance },
             { "push",    PushOperation.Instance },
@@ -40,18 +50,21 @@ namespace TurtlePost
             // Strings
             { "concat",  ConcatOperation.Instance },
 
-            // I/O
+            // Terminal
             { "print",   PrintOperation.Instance },
             { "println", PrintLineOperation.Instance },
             { "input",   InputOperation.Instance },
+            { "cls",     ClearOperation.Instance },
+            { "width",   WidthOperation.Instance },
+            { "height",  HeightOperation.Instance },
+            { "cursor",  CursorOperation.Instance },
 
             // Stack manipulation
             { "dup",     DuplicateOperation.Instance },
             { "drop",    DropOperation.Instance  },
             { "swap",    SwapOperation.Instance },
             { "over",    OverOperation.Instance },
-
-
+            
             // Boolean logic
             { "not",     NotOperation.Instance },
             { "and",     AndOperation.Instance },

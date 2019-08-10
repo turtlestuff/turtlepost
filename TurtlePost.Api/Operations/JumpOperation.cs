@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TurtlePost.Operations
+﻿namespace TurtlePost.Operations
 {
     class JumpOperation : Operation
     {

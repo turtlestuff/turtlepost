@@ -1,7 +1,5 @@
 ﻿using System;
 using static TurtlePost.I18N;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TurtlePost.Operations
 {
