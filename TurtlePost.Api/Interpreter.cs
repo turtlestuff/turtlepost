@@ -32,6 +32,8 @@ namespace TurtlePost
             { "mul",     MultiplyOperation.Instance },
             { "div",     DivideOperation.Instance },
             { "mod",     ModuloOperation.Instance },
+            { "sqrt",    SquareRootOperation.Instance },
+            { "pow",     PowerOperation.Instance }, 
             
             // Rounding
             { "ceil",    CeilingOperation.Instance },

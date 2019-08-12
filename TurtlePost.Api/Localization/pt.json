@@ -2,9 +2,29 @@
     "help": "Digite help para uma lista de operações",
     "version": "TurtlePost Versão {0}",
     "exit": "Pressione qualquer tecla para continuar...",
-    "exitExplanation": "Para sair do TurtlePost, apete CTRL+D ou use a operação 'exit'.",
+    "translationError": "Erro em ler a tradução {0}:",
+    "exitExplanation": "Para sair do TurtlePost, aperte CTRL+D ou use a operação 'exit'.",
     "copying": "Esse programa é software livre e vem com ABSOLUTAMENTE NEHUMA GARANTIA. Você pode redistribuí-lo dentro de certas condições; digite 'copying' para obter detalhes.",
     "copyingNotice": "Este programa é software livre: você pode redistribuí-lo e/ou modificá-lo sob os termos da Licença Pública Geral Menor GNU, conforme publicado pela Free Software Foundation, seja a versão 3 da Licença ou (a seu critério) qualquer versão posterior.",
     "warrantyNotice": "Este programa é distribuído na esperança de que seja útil, mas SEM QUALQUER GARANTIA; sem a garantia implícita de COMERCIALIZAÇÃO OU ADEQUAÇÃO A UM DETERMINADO PROPÓSITO. Veja a Licença Pública Geral GNU para obter mais detalhes.",
-    "licenseNotice": "Você deve ter recebido uma cópia da Licença Pública Geral Menor GNU junto com este programa. Se não, veja <https://www.gnu.org/licenses/>."
+    "licenseNotice": "Você deve ter recebido uma cópia da Licença Pública Geral Menor GNU junto com este programa. Se não, veja <https://www.gnu.org/licenses/>.",
+
+    "pos": "posição",
+    "executionTime": "Tempo de execução: {0}ms",
+    "internalError": "Erro interno: {0}",
+    "error": "Erro",
+    "labels": "Etiquetas:",
+    "globals": "Globais:",
+
+
+    "TP0001": "Não pôde retirar valor; stack do usuário está vazia.",
+    "TP0002": "Não pôde retornar; stack de chamadas está vazia.",
+    "TP0003": "Tentou retirar valor de tipo '{0}', retirou-se tipo '{1}'.",
+    "TP0004": "Operação inexistente.",
+    "TP0005": "Etiqueta inexistente.",
+    "TP0006": "Etiqueta duplicada foi encontrada.",
+    "TP0007": "Número não estava em formato válido.",
+    "TP0008": "Sequência de escape não estava em formato válido.",
+    "TP0009": "Padrão de escape inválido.",
+    "TP0010": "Não pôde analisar número inválido '{0}'."
 }

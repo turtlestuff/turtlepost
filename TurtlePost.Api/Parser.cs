@@ -24,6 +24,11 @@ namespace TurtlePost
         void ReadNumber(ref Diagnostic d)
         {
             var buffer = ReadToNextDelimiter();
+            if (buffer.Equals("2PI", StringComparison.Ordinal))
+            {
+                UserStack.Push(Math.PI*2);
+                return;
+            }
             if (!double.TryParse(buffer, NumberStyles.Any, CultureInfo.InvariantCulture, out var num))
             {
                 d = new Diagnostic(TR["TP0007"], "TP0007", DiagnosticType.Error, buffer);
@@ -47,6 +52,12 @@ namespace TurtlePost
                     return null;
                 case var _ when buffer.Equals("null", StringComparison.Ordinal):
                     UserStack.Push(null);
+                    return null;
+                case var _ when buffer.Equals("PI", StringComparison.Ordinal):
+                    UserStack.Push(Math.PI);
+                    return null;
+                case var _ when buffer.Equals("E", StringComparison.Ordinal):
+                    UserStack.Push(Math.E);
                     return null;
                 default:
                     if (!Operations.TryGetValue(buffer.ToString(), out var op))

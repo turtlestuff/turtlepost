@@ -26,4 +26,5 @@
     "TP0007": "Number was not in a valid format.",
     "TP0008": "Escape sequence was not in a valid format.",
     "TP0009": "Invalid escape pattern.",
-    "TP0010": "Could not parse invalid number '{0}'."}   
+    "TP0010": "Could not parse invalid number '{0}'."
+}   

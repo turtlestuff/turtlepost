@@ -123,6 +123,8 @@ Note that subroutines will still be executed as normal code if the interpreter r
 | <kbd>mul</kbd>   | Pops two numbers, multiplies the top by the bottom, and pushes the resulting product.     |
 | <kbd>div</kbd>   | Pops two numbers, divides the top by the bottom, and pushes the resulting quotient.       |
 | <kbd>mod</kbd>   | Pops two numbers, divides the top by the bottom, and pushes the resulting remainder.      |
+| <kbd>sqrt</kbd>  | Pops a number, pushes the resulting square root                                            |
+| <kbd>pow</kbd>   | Pops a number, pushes the resulting exponent  |
 
 ### Rounding
 | Name             | Operation                                   |
@@ -207,6 +209,14 @@ Note that subroutines will still be executed as normal code if the interpreter r
 | <kbd>nop</kbd>     | Performs no operation.                                                              |
 | <kbd>help</kbd>    | Prints out a list of all operations the interpreter is configured to use.           |
 | <kbd>copying</kbd> | Prints out information about redistribution, warranty, and licensing of TurtlePost. |
+
+#### Constants
+| Name             | Operation                             |
+|:----------------:|---------------------------------------|
+| <kbd>PI</kbd>    | Pushes π to the stack.                |
+| <kbd>2PI</kbd>   | Pushes 2π to the stack.               |
+| <kbd>E</kbd>     | Pushes e to the stack.                |
+
 
 ## Localizations
 A special thanks for these folks for translating TurtlePost:
