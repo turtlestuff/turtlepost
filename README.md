@@ -220,7 +220,7 @@ Note that subroutines will still be executed as normal code if the interpreter r
 
 ## Localizations
 A special thanks for these folks for translating TurtlePost:
-- **Esperanto** - Astro
+- **Esperanto** - [Astro](https://github.com/Astronomy487)
 - **Dutch** - JelleTheWhale
 - **Portuguese** - [Vrabbers](https://github.com/Vrabbers)
 - **Ukranian** - [John Tur](https://github.com/reflectronic)
