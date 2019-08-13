@@ -2,9 +2,29 @@
     "help": "Skribu 'help' por listo de funkcioj.",
     "version": "TurtlePost Versio {0}",
     "exit": "Premu iu ajn klavo por eliri...",
+    "translationError": "Erare legi tradukon {0}:",
     "exitExplanation": "Por eliri TurtlePost, premu CTRL+D aŭ uzu la funkcio 'exit'.",
     "copying": "Ĉi tiu programo estas programaro libera kaj estas ABSOLUTE SEN GARANTIO. Vi libere povas redisdoni ĝin malsupre iom kondiĉoj; skribu 'copying' por informaĵo.",
     "copyingNotice": "Ĉi tiu programo estas programaro libera: virajtas redisdoni ĝin kaj/aŭ ŝanĝi ĝin malsupre la kondiĉo de la GNU Lesser General Public License kiel publikigita de la Free Software Foundation, aŭ versio 3 de la Licenco aŭ (en via elekto) ia ajn versio pli malfrua.",
     "warrantyNotice": "Ĉi tiu programo estas disdonita en la espero ke ĝi estos utila, sed SEN GARANTIO; eĉ sen la grantio implicita de MERKONTABLETO aŭ UTILECO POR IA CELO.  Vidu la GNU Lesser General Public License por informaĵo.", 
-    "licenseNotice": "Vi devis ricevi kopio de la GNU Lesser General Public License kun ĉi tiu programo.  Se ne, vidu <https://www.gnu.org/licenses/>."
+    "licenseNotice": "Vi devis ricevi kopio de la GNU Lesser General Public License kun ĉi tiu programo.  Se ne, vidu <https://www.gnu.org/licenses/>.",
+
+    "pos": "kodloko",
+    "executionTime": "Tempo por fari: {0}ms",
+    "internalError": "Interna eraro: {0}",
+    "error": "Eraro:",
+    "labels": "Etikedoj:",
+    "globals": "Tutmondoj:",
+
+
+    "TP0001": "Ne povas forigi valoron; uzantes amaso malplenigas.",
+    "TP0002": "Ne povas redoni; amaso malplenigas.",
+    "TP0003": "Penis forigi tipon '{0}', anstataŭe forigis tipon '{1}'.",
+    "TP0004": "Nenia funkcio.",
+    "TP0005": "Nenia etikedo.",
+    "TP0006": "Etikedo duobla trovita.",
+    "TP0007": "Nombro estis en malvalida formato.",
+    "TP0008": "Eskaposekvenco estis en malvalida formato.",
+    "TP0009": "Eskapopadrono malvalida.",
+    "TP0010": "Ne povis legi nombro malvalida '{0}'."
 }
