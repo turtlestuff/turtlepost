@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
 using static TurtlePost.I18N;
 
@@ -85,6 +86,11 @@ namespace TurtlePost
                 else
                     Console.WriteLine();
             }
+        }
+
+        public static string TypeName(Type? type)
+        {
+            return type == typeof(double) ? "number" : type?.Name.ToLower() ?? "null";
         }
     }
 }

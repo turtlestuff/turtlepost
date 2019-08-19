@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using static TurtlePost.I18N;
@@ -9,6 +10,7 @@ namespace TurtlePost
     {
         static void Main(string[] args)
         {
+            
             if (args.Length == 0)
             {
                 Console.WriteLine(TR["version"],

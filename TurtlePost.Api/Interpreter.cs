@@ -92,10 +92,12 @@ namespace TurtlePost
             { "ret",     ReturnOperation.Instance },
 
             // Miscellaneous 
+            { "typeof",  TypeOfOperation.Instance }, 
             { "exit",    ExitOperation.Instance },
             { "nop",     NoOperation.Instance },
             { "help",    HelpOperation.Instance },
-            { "copying", CopyingOperation.Instance }
+            { "copying", CopyingOperation.Instance },
+            
         };
 
         static readonly Regex LabelRegex = new Regex(@"@(\w)*:", RegexOptions.Compiled);

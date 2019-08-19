@@ -4,7 +4,7 @@
     "exit": "Pressione qualquer tecla para continuar...",
     "translationError": "Erro em ler a tradução {0}:",
     "exitExplanation": "Para sair do TurtlePost, aperte CTRL+D ou use a operação 'exit'.",
-    "copying": "Esse programa é software livre e vem com ABSOLUTAMENTE NEHUMA GARANTIA. Você pode redistribuí-lo dentro de certas condições; digite 'copying' para obter detalhes.",
+    "copying": "Esse programa é software livre e vem com ABSOLUTAMENTE NENHUMA GARANTIA. Você pode redistribuí-lo dentro de certas condições; digite 'copying' para obter detalhes.",
     "copyingNotice": "Este programa é software livre: você pode redistribuí-lo e/ou modificá-lo sob os termos da Licença Pública Geral Menor GNU, conforme publicado pela Free Software Foundation, seja a versão 3 da Licença ou (a seu critério) qualquer versão posterior.",
     "warrantyNotice": "Este programa é distribuído na esperança de que seja útil, mas SEM QUALQUER GARANTIA; sem a garantia implícita de COMERCIALIZAÇÃO OU ADEQUAÇÃO A UM DETERMINADO PROPÓSITO. Veja a Licença Pública Geral GNU para obter mais detalhes.",
     "licenseNotice": "Você deve ter recebido uma cópia da Licença Pública Geral Menor GNU junto com este programa. Se não, veja <https://www.gnu.org/licenses/>.",

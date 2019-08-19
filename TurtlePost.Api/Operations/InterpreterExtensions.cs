@@ -12,15 +12,17 @@ namespace TurtlePost.Operations
                 value = default!;
                 return false;
             }
-
-            if (obj is T var)
+            
+            
+            
+            if (typeof(T) == typeof(object)||obj is T )
             {
-                value = var;
+                value = (T)obj!;
                 return true;
             }
 
-            var expectedType = typeof(T) == typeof(double) ? "number" : typeof(T).Name.ToLower();
-            d = new Diagnostic(TR["TP0003", expectedType, obj?.GetType().Name.ToLower() ?? "null"],
+            var expectedType = Utils.TypeName(typeof(T));
+            d = new Diagnostic(TR["TP0003", expectedType, Utils.TypeName(obj?.GetType())],
                 "TP0003", DiagnosticType.Error, d.Span);
             value = default!;
             return false;
