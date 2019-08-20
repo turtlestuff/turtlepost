@@ -39,23 +39,33 @@ namespace TurtlePost
         {
             switch (o)
             {
-                case string s:
+                case string str:
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write('"');
-                    Console.Write(s);
+                    Console.Write(str);
                     Console.Write('"');
                     break;
-                case double d:
+                case double num:
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.Write(d);
+                    Console.Write(num);
                     break;
-                case Global g:
+                case Global global:
                     Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.Write("&{0}", g.Name);                   
+                    Console.Write("&{0}", global.Name);                   
                     break;
-                case Label l:
+                case Label label:
                     Console.ForegroundColor = ConsoleColor.Magenta;
-                    Console.Write("@{0}", l.Name);
+                    Console.Write("@{0}", label.Name);
+                    break;
+                case Stack<object?> list:
+                    Console.ResetColor();
+                    Console.Write("{");
+                    foreach (var item in list)
+                    {
+                        Console.Write(" ");
+                        WriteFormatted(item);
+                    }
+                    Console.Write(" }");
                     break;
                 case bool b:
                     Console.ForegroundColor = ConsoleColor.DarkBlue;
@@ -88,9 +98,6 @@ namespace TurtlePost
             }
         }
 
-        public static string TypeName(Type? type)
-        {
-            return type == typeof(double) ? "number" : type?.Name.ToLower() ?? "null";
-        }
+        public static string GetTypeName(Type? type) => type == typeof(double) ? "number" : type?.Name.ToLower() ?? "null";
     }
 }

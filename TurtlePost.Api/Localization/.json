@@ -15,8 +15,7 @@
     "error": "Error",
     "labels": "Labels:",
     "globals": "Globals:",
-
-
+    
     "TP0001": "Cannot pop value; user stack is empty.",
     "TP0002": "Cannot return; call stack is empty.",
     "TP0003": "Tried to pop type '{0}', instead got type '{1}'.",
@@ -26,5 +25,7 @@
     "TP0007": "Number was not in a valid format.",
     "TP0008": "Escape sequence was not in a valid format.",
     "TP0009": "Invalid escape pattern.",
-    "TP0010": "Could not parse invalid number '{0}'."
+    "TP0010": "Could not parse invalid number '{0}'.",
+    "TP0011": "Unexpected EOF; '}' expected.",
+    "TP0012": "An operation is not in this context."
 }   

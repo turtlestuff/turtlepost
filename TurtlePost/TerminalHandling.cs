@@ -6,6 +6,8 @@ using static TurtlePost.I18N;
 
 namespace TurtlePost
 {
+    delegate void KeyResponse(ref Diagnostic diagnostic);
+    
     static partial class Program
     {
         struct KeyPressed
@@ -24,15 +26,15 @@ namespace TurtlePost
         static bool InputComplete;
         static StringBuilder CurrentInput = new StringBuilder(256);
 
-        static ImmutableDictionary<KeyPressed, Action> Keys = new Dictionary<KeyPressed, Action>
+        static ImmutableDictionary<KeyPressed, KeyResponse> Keys = new Dictionary<KeyPressed, KeyResponse>
         {
             {
-                new KeyPressed(ConsoleKey.D, ConsoleModifiers.Control), () =>
+                new KeyPressed(ConsoleKey.D, ConsoleModifiers.Control), (ref Diagnostic d) =>
                 {
                     if (CurrentInput.Length == 0)
                     {
                         Console.WriteLine("exit");
-                        DirectInterpreter.Interpret("exit", true);
+                        DirectInterpreter.Interpret("exit", ref d);
                         InputComplete = true;
                     }
                     else
@@ -43,18 +45,18 @@ namespace TurtlePost
                 }
             },
             {
-                new KeyPressed(ConsoleKey.Enter, 0), () =>
+                new KeyPressed(ConsoleKey.Enter, 0), (ref Diagnostic d) =>
                 {
                     //Interpret the current line
                     Console.WriteLine();
                     if (CurrentInput.Length != 0) 
-                        DirectInterpreter.Interpret(CurrentInput.ToString(), true);
+                        DirectInterpreter.Interpret(CurrentInput.ToString(), ref d);
                     
                     InputComplete = true;
                 }
             },
             {
-                new KeyPressed(ConsoleKey.Backspace, 0), () =>
+                new KeyPressed(ConsoleKey.Backspace, 0), (ref Diagnostic _) =>
                 {
                     if (CurrentInput.Length == 0)
                     {
@@ -70,7 +72,7 @@ namespace TurtlePost
                 }
             },
             {
-                new KeyPressed(ConsoleKey.C, ConsoleModifiers.Control), () =>
+                new KeyPressed(ConsoleKey.C, ConsoleModifiers.Control), (ref Diagnostic _) =>
                 {
                     //Reset the input buffer
                     Console.WriteLine();

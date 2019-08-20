@@ -1,6 +1,9 @@
 using System;
 using System.Buffers;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using TurtlePost.Operations;
@@ -10,37 +13,60 @@ namespace TurtlePost
 {
     public partial class Interpreter
     {
-        ReadOnlySpan<char> ReadToNextDelimiter(char? c = null)
+        ReadOnlySpan<char> ReadToNextDelimiter(out bool eof, char? c = null)
         {
+            eof = false;
             var start = Enumerator.Position;
             do
             {
-                if (!Enumerator.MoveNext()) break;
+                if (!Enumerator.MoveNext())
+                {
+                    eof = true;
+                    break;
+                }
             } while (c == null ? !char.IsWhiteSpace(Enumerator.Current) : c != Enumerator.Current);
 
-            return Code[start..Enumerator.Position];
+            return Code.AsSpan()[start..Enumerator.Position];
         }
 
         void ReadNumber(ref Diagnostic d)
         {
-            var buffer = ReadToNextDelimiter();
+            var buffer = ReadToNextDelimiter(out _);
             if (buffer.Equals("2PI", StringComparison.Ordinal))
             {
-                UserStack.Push(Math.PI*2);
-                return;
-            }
-            if (!double.TryParse(buffer, NumberStyles.Any, CultureInfo.InvariantCulture, out var num))
-            {
-                d = new Diagnostic(TR["TP0007"], "TP0007", DiagnosticType.Error, buffer);
+                UserStack.Push(Math.PI * 2);
                 return;
             }
 
-            UserStack.Push(num);
+            if (double.TryParse(buffer, NumberStyles.Any, CultureInfo.InvariantCulture, out var num))
+                UserStack.Push(num);
+            else
+                d = Diagnostic.Translate("TP0007", DiagnosticType.Error, buffer);
+        }
+        
+        void ReadList(ref Diagnostic d)
+        {
+            var buffer = ReadToNextDelimiter(out var eof, '}');
+            if (eof)
+            {
+                d = Diagnostic.Translate("TP0011", DiagnosticType.Error, buffer);
+            }
+            
+            var list = new Stack<object?>();
+
+            // If the length is 2, the input must be {}; thus, we shouldn't try and parse anything. 
+            // Likewise, if there is only whitespace between the braces, we know the list is empty.
+            if (buffer.Length > 1 && !buffer[1..].IsWhiteSpace())
+                new Interpreter { UserStack = list }.Interpret(buffer[1..].ToString(), ref d,
+                    new InterpretationOptions { DisallowOperations = true, HideDiagnostics = true, HideStack = true });
+            
+            UserStack.Push(new Stack<object?>(list));
         }
 
-        Operation? ReadOperation(ref Diagnostic d)
+
+        Operation? ReadOperation(ref Diagnostic d, bool allowOperations)
         {
-            var buffer = ReadToNextDelimiter();
+            var buffer = ReadToNextDelimiter(out _);
             d.Span = buffer;
             switch (buffer)
             {
@@ -60,9 +86,14 @@ namespace TurtlePost
                     UserStack.Push(Math.E);
                     return null;
                 default:
+                    if (!allowOperations)
+                    {
+                        d = Diagnostic.Translate("TP0012", DiagnosticType.Error, buffer);
+                        return null;
+                    }
                     if (!Operations.TryGetValue(buffer.ToString(), out var op))
                     {
-                        d = new Diagnostic(TR["TP0004"], "TP0004", DiagnosticType.Error, buffer);
+                        d = Diagnostic.Translate("TP0004", DiagnosticType.Error, buffer);
                     }
 
                     return op;
@@ -87,7 +118,7 @@ namespace TurtlePost
             }
 
             Enumerator.MoveNext(); // Skip " character
-            var sourceString = ReadToNextDelimiter('"');
+            var sourceString = ReadToNextDelimiter(out _, '"');
 
             // Before we push the input string to the stack, we need to parse escape sequences. Since the buffer we 
             // get from the source is read-only (strings are immutable), we will need to make our own temporary mutable
@@ -152,7 +183,7 @@ namespace TurtlePost
                         if (!ushort.TryParse(buffer[(i + 2)..(i + 6)], NumberStyles.HexNumber,
                             CultureInfo.InvariantCulture, out var utf16CodeUnit))
                         {
-                            d = new Diagnostic(TR["TP0008"], "TP0008", DiagnosticType.Error, sourceString, i + 2);
+                            d = Diagnostic.Translate("TP0008", DiagnosticType.Error, sourceString, i + 2);
                             if (rentedArr != null)
                                 ArrayPool<char>.Shared.Return(rentedArr);
                             return;
@@ -172,7 +203,7 @@ namespace TurtlePost
                         if (!uint.TryParse(buffer[(i + 2)..(i + 10)], NumberStyles.HexNumber, 
                             CultureInfo.InvariantCulture, out var utf32CodeUnit))
                         {
-                            d = new Diagnostic(TR["TP0008"], "TP0008", DiagnosticType.Error, sourceString, i + 2);
+                            d = Diagnostic.Translate("TP0008", DiagnosticType.Error, sourceString, i + 2);
                             if (rentedArr != null)
                                 ArrayPool<char>.Shared.Return(rentedArr);
                             return;
@@ -199,7 +230,7 @@ namespace TurtlePost
                         ShiftBufferSegment(ref buffer, i + 10, 10 - charsWritten);
                         continue;
                     default:
-                        d = new Diagnostic(TR["TP0009"], "TP0009", DiagnosticType.Error, sourceString);
+                        d = Diagnostic.Translate("TP0009", DiagnosticType.Error, sourceString);
                         if (rentedArr != null)
                             ArrayPool<char>.Shared.Return(rentedArr);
                         return;
@@ -233,19 +264,19 @@ namespace TurtlePost
         void SkipComment()
         {
             Enumerator.MoveNext(); // Skip / character
-            ReadToNextDelimiter('/');
+            ReadToNextDelimiter(out _, '/');
         }
 
         void ReadGlobal()
         {
             Enumerator.MoveNext(); // Skip & character
-            var buffer = ReadToNextDelimiter();
+            var buffer = ReadToNextDelimiter(out _);
             UserStack.Push(globals[buffer.ToString()]);
         }
 
         void ReadLabel(ref Diagnostic d)
         {
-            var buffer = ReadToNextDelimiter();
+            var buffer = ReadToNextDelimiter(out _);
             if (buffer[^1] == ':')
             {
                 // Label declaration; do not do anything
@@ -254,7 +285,7 @@ namespace TurtlePost
 
             if (!labels.TryGetValue(buffer[1..].ToString(), out var label))
             {
-                d = new Diagnostic(TR["TP0005"], "TP0005", DiagnosticType.Error, buffer);
+                d = Diagnostic.Translate("TP0005", DiagnosticType.Error, buffer);
                 return;
             }
 

@@ -16,7 +16,7 @@ namespace TurtlePost.Operations
             if (!interpreter.TryPopA<string>(ref diagnostic, out var str)) return;
             if (!double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out var number))
             {
-                diagnostic = new Diagnostic(TR["TP0010", str], "TP0010", DiagnosticType.Error, diagnostic.Span);
+                diagnostic = Diagnostic.Translate("TP0010", DiagnosticType.Error, diagnostic.Span);
                 return;
             }
             

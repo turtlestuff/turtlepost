@@ -15,14 +15,14 @@ namespace TurtlePost
             // Do the regex compilation early to minimize perf hit on first evaluation
             LabelRegex.Match("");
         }
-
+        
         public MovableStringEnumerator Enumerator { get; private set; } = default!;
         
         public string Code { get; private set; } = "";
         
         public Stack<int> CallStack { get; } = new Stack<int>();
         
-        public Stack<object?> UserStack { get; } = new Stack<object?>();
+        public Stack<object?> UserStack { get; private set; } = new Stack<object?>();
         
         public Dictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
         {
@@ -106,17 +106,20 @@ namespace TurtlePost
         
         readonly GlobalBag globals = new GlobalBag();
 
-        bool CheckError(in Diagnostic d)
+        bool CheckDiagnostic(in Diagnostic d, InterpretationOptions options)
         {
-            switch (d.DiagnosticType)
+            switch (d.Type)
             {
                 case DiagnosticType.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("{0} {1}: {2} ['", TR["error"], d.Id, d.Message);
-                    Console.Out.Write(d.Span);
-                    Console.WriteLine("', {0} {1}]", TR["pos"],
-                        (d.SourceLocation ?? Enumerator.Position - d.Span.Length).ToString());
-                    Console.ResetColor();
+                    if (!options.HideDiagnostics)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("{0} {1}: {2} ['", TR["error"], d.Id, d.Message);
+                        Console.Out.Write(d.Span);
+                        Console.WriteLine("', {0} {1}]", TR["pos"],
+                            (d.SourceLocation ?? Enumerator.Position - d.Span.Length).ToString());
+                        Console.ResetColor();
+                    }
                     UserStack.Clear();
                     return true;
                 default:
@@ -124,19 +127,26 @@ namespace TurtlePost
             }
         }
 
-        public void Interpret(string code, bool printOutput)
+        public struct InterpretationOptions
         {
-            Diagnostic d = default;
+            public bool HideStack { get; set; }
+            public bool DisallowOperations { get; set; }
+            public bool HideDiagnostics { get; set; }
+        }
+
+        public void Interpret(string code, ref Diagnostic diagnostic, InterpretationOptions options = default)
+        {
 #if DEBUG
             Stopwatch sw = default!;
-            if (printOutput) 
+            if (!options.HideStack) 
                 sw = Stopwatch.StartNew();
 #endif
-            SetupInterpreter(code, ref d);
-            if (CheckError(in d)) 
+            SetupInterpreter(code, ref diagnostic);
+            
+            if (CheckDiagnostic(diagnostic, options))
                 return;
 #if DEBUG
-            if (printOutput)
+            if (!options.HideStack)
                 Utils.PrintLabels(labels);
 #endif
             try
@@ -145,30 +155,33 @@ namespace TurtlePost
                 {
                     // Break on EOF
                     if (!Enumerator.MoveNext()) break;
-                    
+
                     switch (Enumerator.Current)
                     {
                         case '&':
                             ReadGlobal();
-                            break;
-                        case '"':
-                            ReadString(ref d);
-                            break;
+                            continue;
                         case '@':
-                            ReadLabel(ref d);
-                            break;
+                            ReadLabel(ref diagnostic);
+                            continue;
+                        case '{':
+                            ReadList(ref diagnostic);
+                            continue;
+                        case '"':
+                            ReadString(ref diagnostic);
+                            continue;
                         case '/':
                             SkipComment();
-                            break;
+                            continue;
                         case '.':
                         case char c when char.IsDigit(c):
-                            ReadNumber(ref d);
-                            break;
+                            ReadNumber(ref diagnostic);
+                            continue;
                         case char c when char.IsWhiteSpace(c):
-                            break;
+                            continue;
                         default:
-                            ReadOperation(ref d)?.Operate(this, ref d);
-                            break;
+                            ReadOperation(ref diagnostic, !options.DisallowOperations)?.Operate(this, ref diagnostic);
+                            continue;
                     }
                 }
             }
@@ -180,9 +193,9 @@ namespace TurtlePost
                 UserStack.Clear();
             }
 
-            CheckError(in d);
+            CheckDiagnostic(diagnostic, options);
 
-            if (printOutput)
+            if (!options.HideStack)
             {
 #if DEBUG
                 sw.Stop();
@@ -195,8 +208,9 @@ namespace TurtlePost
                 labels.Clear();
                 CallStack.Clear();
             }
-        }
 
+        }
+        
         void SetupInterpreter(string code, ref Diagnostic d)
         {
             Enumerator = new MovableStringEnumerator(code);
@@ -211,7 +225,7 @@ namespace TurtlePost
                 var s = i.Value[1..^1];
                 if (!labels.TryAdd(s, new Label(s, i.Index)))
                 {
-                    d = new Diagnostic(TR["TP0006"], "TP0006", DiagnosticType.Error, i.Value, i.Index);
+                    d = Diagnostic.Translate("TP0006", DiagnosticType.Error, i.Value, i.Index);
                     return;
                 }
             }

@@ -10,7 +10,7 @@
 
         public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            interpreter.TryPopAny(ref diagnostic, out _);
+            interpreter.TryPopA<object>(ref diagnostic, out _);
         }
     }
 }

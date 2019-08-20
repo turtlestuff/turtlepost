@@ -10,7 +10,7 @@ namespace TurtlePost
     {
         static void Main(string[] args)
         {
-            
+            Diagnostic d = default;
             if (args.Length == 0)
             {
                 Console.WriteLine(TR["version"],
@@ -35,7 +35,7 @@ namespace TurtlePost
                         var keyPressed = new KeyPressed(key.Key, key.Modifiers);
                         if (Keys.TryGetValue(keyPressed, out var func))
                         {
-                            func();
+                            func(ref d);
                         }
                         else if (!char.IsControl(key.KeyChar))
                         {
@@ -46,13 +46,16 @@ namespace TurtlePost
 
                     CurrentInput.Clear();
                     InputComplete = false;
+
+                    if (d.Type != DiagnosticType.None)
+                        d = default;
                 }
             }
             else
             {
                 // Load file
                 var code = File.ReadAllText(args[0]);
-                new Interpreter().Interpret(code, false);
+                new Interpreter().Interpret(code, ref d, new Interpreter.InterpretationOptions { HideStack = true });
                 Console.WriteLine();
                 Console.WriteLine(TR["exit"]);
                 Console.ReadKey();
