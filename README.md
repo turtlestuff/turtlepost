@@ -139,7 +139,7 @@ List literals are declared with a set of curly braces. Initial values can be add
 | <kbd>div</kbd>   | Pops two numbers, divides the top by the bottom, and pushes the resulting quotient.                                   |
 | <kbd>mod</kbd>   | Pops two numbers, divides the top by the bottom, and pushes the resulting remainder.                                  |
 | <kbd>sqrt</kbd>  | Pops a number, calculates its square root, and pushes the resulting root extraction.                                  |
-| <kbd>pow</kbd>   | Pops two numbers, raises the second number to the power of the first number, and pushes the resulting exponentiation. |
+| <kbd>pow</kbd>   | Pops two numbers, raises the bottom number to the power of the top number, and pushes the resulting exponentiation. |
 
 ### Rounding
 | Name             | Operation                                   |
