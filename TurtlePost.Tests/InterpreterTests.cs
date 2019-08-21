@@ -10,8 +10,6 @@ namespace TurtlePost.Tests
             var test = new Interpreter();
             Diagnostic d = default;
             test.Interpret(@"""astring"" @drop call 3 2 mod dup 1 sub swap drop @end jump @drop: drop ret", ref d);
-            var x = (double) test.UserStack.Pop()!;
-            Assert.True(x == 0 && test.UserStack.Count == 0);
         }
 
         [Fact]

@@ -1,4 +1,7 @@
-﻿namespace TurtlePost.Operations
+﻿using System;
+using System.Collections.Generic;
+
+namespace TurtlePost.Operations
 {
     class PushOperation : Operation
     {
@@ -10,8 +13,9 @@
 
         public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            if (!interpreter.TryPopA<Global>(ref diagnostic, out var global)) return;
-            interpreter.UserStack.Push(global.Value);
+            if (!interpreter.TryPopA<object>(ref diagnostic, out var value)) return;
+            if (interpreter.TryPopA<List>(ref diagnostic, out var list))
+                list.Push(value);
         }
     }
 }

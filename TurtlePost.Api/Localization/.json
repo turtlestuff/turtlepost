@@ -27,5 +27,6 @@
     "TP0009": "Invalid escape pattern.",
     "TP0010": "Could not parse invalid number '{0}'.",
     "TP0011": "Unexpected EOF; '}' expected.",
-    "TP0012": "An operation is not in this context."
+    "TP0012": "An operation is not allowed in this context.",
+    "TP0013": "Index '{0}' was outside the bounds of the list."
 }   

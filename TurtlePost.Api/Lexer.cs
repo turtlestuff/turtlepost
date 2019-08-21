@@ -29,7 +29,7 @@ namespace TurtlePost
             return Code.AsSpan()[start..Enumerator.Position];
         }
 
-        void ReadNumber(ref Diagnostic d)
+        void LexNumber(ref Diagnostic d)
         {
             var buffer = ReadToNextDelimiter(out _);
             if (buffer.Equals("2PI", StringComparison.Ordinal))
@@ -44,7 +44,7 @@ namespace TurtlePost
                 d = Diagnostic.Translate("TP0007", DiagnosticType.Error, buffer);
         }
         
-        void ReadList(ref Diagnostic d)
+        void LexList(ref Diagnostic d)
         {
             var buffer = ReadToNextDelimiter(out var eof, '}');
             if (eof)
@@ -52,7 +52,7 @@ namespace TurtlePost
                 d = Diagnostic.Translate("TP0011", DiagnosticType.Error, buffer);
             }
             
-            var list = new Stack<object?>();
+            var list = new List();
 
             // If the length is 2, the input must be {}; thus, we shouldn't try and parse anything. 
             // Likewise, if there is only whitespace between the braces, we know the list is empty.
@@ -60,11 +60,11 @@ namespace TurtlePost
                 new Interpreter { UserStack = list }.Interpret(buffer[1..].ToString(), ref d,
                     new InterpretationOptions { DisallowOperations = true, HideDiagnostics = true, HideStack = true });
             
-            UserStack.Push(new Stack<object?>(list));
+            UserStack.Push(list);
         }
 
 
-        Operation? ReadOperation(ref Diagnostic d, bool allowOperations)
+        Operation? LexOperation(ref Diagnostic d, bool allowOperations)
         {
             var buffer = ReadToNextDelimiter(out _);
             d.Span = buffer;
@@ -100,7 +100,7 @@ namespace TurtlePost
             }
         }
 
-        void ReadString(ref Diagnostic d)
+        void LexString(ref Diagnostic d)
         {
             // This function shifts a sub-slice of the buffer to the left a specified amount of times.
             // The sub-slice starts at the given start index and continues to the end (we don't need anything more).
@@ -267,14 +267,14 @@ namespace TurtlePost
             ReadToNextDelimiter(out _, '/');
         }
 
-        void ReadGlobal()
+        void LexGlobal()
         {
             Enumerator.MoveNext(); // Skip & character
             var buffer = ReadToNextDelimiter(out _);
             UserStack.Push(globals[buffer.ToString()]);
         }
 
-        void ReadLabel(ref Diagnostic d)
+        void LexLabel(ref Diagnostic d)
         {
             var buffer = ReadToNextDelimiter(out _);
             if (buffer[^1] == ':')

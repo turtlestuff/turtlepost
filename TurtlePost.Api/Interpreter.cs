@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Reflection;
 using TurtlePost.Operations;
 using static TurtlePost.I18N;
 using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
@@ -22,7 +23,7 @@ namespace TurtlePost
         
         public Stack<int> CallStack { get; } = new Stack<int>();
         
-        public Stack<object?> UserStack { get; private set; } = new Stack<object?>();
+        public List UserStack { get; private set; } = new List();
         
         public Dictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
         {
@@ -46,12 +47,20 @@ namespace TurtlePost
             { "tan",     TangentOperation.Instance },
 
             // Globals
+            { "read",    ReadOperation.Instance },
             { "write",   WriteOperation.Instance },
-            { "push",    PushOperation.Instance },
 
             // Strings
             { "concat",  ConcatOperation.Instance },
+            
+            // Lists
+            { "pop",     PopOperation.Instance },
+            { "push",    PushOperation.Instance },
+            { "get",     GetOperation.Instance },
+            { "set",     SetOperation.Instance },
+            { "del",     DeleteOperation.Instance },
 
+            
             // Terminal
             { "print",   PrintOperation.Instance },
             { "println", PrintLineOperation.Instance },
@@ -97,7 +106,6 @@ namespace TurtlePost
             { "nop",     NoOperation.Instance },
             { "help",    HelpOperation.Instance },
             { "copying", CopyingOperation.Instance },
-            
         };
 
         static readonly Regex LabelRegex = new Regex(@"@(\w)*:", RegexOptions.Compiled);
@@ -159,28 +167,28 @@ namespace TurtlePost
                     switch (Enumerator.Current)
                     {
                         case '&':
-                            ReadGlobal();
+                            LexGlobal();
                             continue;
                         case '@':
-                            ReadLabel(ref diagnostic);
+                            LexLabel(ref diagnostic);
                             continue;
                         case '{':
-                            ReadList(ref diagnostic);
+                            LexList(ref diagnostic);
                             continue;
                         case '"':
-                            ReadString(ref diagnostic);
+                            LexString(ref diagnostic);
                             continue;
                         case '/':
                             SkipComment();
                             continue;
                         case '.':
                         case char c when char.IsDigit(c):
-                            ReadNumber(ref diagnostic);
+                            LexNumber(ref diagnostic);
                             continue;
                         case char c when char.IsWhiteSpace(c):
                             continue;
                         default:
-                            ReadOperation(ref diagnostic, !options.DisallowOperations)?.Operate(this, ref diagnostic);
+                            LexOperation(ref diagnostic, !options.DisallowOperations)?.Operate(this, ref diagnostic);
                             continue;
                     }
                 }

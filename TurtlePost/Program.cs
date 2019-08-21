@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Reflection.Metadata;
+using Microsoft.VisualBasic.CompilerServices;
 using static TurtlePost.I18N;
 
 namespace TurtlePost

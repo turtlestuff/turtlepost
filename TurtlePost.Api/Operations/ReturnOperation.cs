@@ -2,7 +2,9 @@
 {
     class ReturnOperation : Operation
     {
-        ReturnOperation() { }
+        ReturnOperation()
+        {
+        }
 
         public static ReturnOperation Instance = new ReturnOperation();
 

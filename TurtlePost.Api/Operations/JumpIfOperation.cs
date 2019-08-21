@@ -10,8 +10,8 @@
 
         public override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
-            var label = (Label) interpreter.UserStack.Pop()!;
-            var cond = (bool) interpreter.UserStack.Pop()!;
+            if (!interpreter.TryPopA<Label>(ref diagnostic, out var label)) return;
+            if (!interpreter.TryPopA<bool>(ref diagnostic, out var cond)) return;
             
             if (cond) 
                 interpreter.Enumerator.Position = label.Position - 1;

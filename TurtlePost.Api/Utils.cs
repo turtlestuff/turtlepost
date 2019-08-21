@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
+using System.Linq.Expressions;
+using System.Reflection;
 using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
 using static TurtlePost.I18N;
 
@@ -9,6 +10,25 @@ namespace TurtlePost
 {
     static class Utils
     {
+        public static Func<TTarget, TField> GetFieldDelegate<TTarget, TField>(FieldInfo info)
+        {
+            var target = Expression.Parameter(typeof(TTarget), "target");
+            var field = Expression.Field(target, info);
+
+            return Expression.Lambda<Func<TTarget, TField>>(field, target).Compile();
+        }
+        
+        public static Action<TTarget, TField> SetFieldDelegate<TTarget, TField>(FieldInfo info)
+        {
+            var target = Expression.Parameter(typeof(TTarget), "target");
+            var value = Expression.Parameter(typeof(TField), "value");
+
+            var field = Expression.Field(target, info);
+            var assign = Expression.Assign(field, value);
+
+            return Expression.Lambda<Action<TTarget, TField>>(assign, target, value).Compile();
+        }
+        
         public static void PrintLabels(LabelBag labels)
         {
             if (labels.Any())
@@ -57,13 +77,13 @@ namespace TurtlePost
                     Console.ForegroundColor = ConsoleColor.Magenta;
                     Console.Write("@{0}", label.Name);
                     break;
-                case Stack<object?> list:
+                case List list:
                     Console.ResetColor();
                     Console.Write("{");
-                    foreach (var item in list)
+                    foreach (var obj in list)
                     {
                         Console.Write(" ");
-                        WriteFormatted(item);
+                        WriteFormatted(obj);
                     }
                     Console.Write(" }");
                     break;
@@ -82,19 +102,18 @@ namespace TurtlePost
             Console.ResetColor();
         }
 
-        public static void PrintStack(Stack<object?> stack)
+        public static void PrintStack(List stack)
         {            
-            for (var i = stack.Count-1; i >= 0; i--)
+            for (var i = 0; i < stack.Count; i++)
             {
-                var o = stack.ElementAt(i);
+                var o = stack[i];
 
                 WriteFormatted(o);
 
-                if (i != 0)
-                    // Do not write separator if this is the last item
-                    Console.Write(" | ");
-                else
+                if (i == stack.Count - 1)
                     Console.WriteLine();
+                else
+                    Console.Write(" | ");
             }
         }
 
