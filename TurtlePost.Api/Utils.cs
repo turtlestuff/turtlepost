@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -10,6 +9,10 @@ namespace TurtlePost
 {
     static class Utils
     {
+        
+        // For List, we access private members of Stack<T> so that we can get the items in the correct order. We use expression trees to make that invocation
+        // fast and only perform the reflection lookup once. Then, we get a delegate which can perform the invocation directly. 
+        
         public static Func<TTarget, TField> GetFieldDelegate<TTarget, TField>(FieldInfo info)
         {
             var target = Expression.Parameter(typeof(TTarget), "target");

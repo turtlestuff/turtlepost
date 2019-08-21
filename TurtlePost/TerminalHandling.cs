@@ -22,7 +22,7 @@ namespace TurtlePost
             }
         }
 
-        static Interpreter DirectInterpreter;
+        static Interpreter DirectInterpreter = default!;
         static bool InputComplete;
         static StringBuilder CurrentInput = new StringBuilder(256);
 

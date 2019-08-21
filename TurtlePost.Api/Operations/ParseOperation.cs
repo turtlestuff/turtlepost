@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using static TurtlePost.I18N;
 
 namespace TurtlePost.Operations
 {

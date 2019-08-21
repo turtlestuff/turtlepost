@@ -1,6 +1,6 @@
 ﻿namespace TurtlePost.Operations
 {
-    public class TypeOfOperation : UnaryOperation<object?, string>
+    class TypeOfOperation : UnaryOperation<object?, string>
     {
         TypeOfOperation()
         {

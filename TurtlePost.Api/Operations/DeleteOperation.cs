@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace TurtlePost.Operations
+﻿namespace TurtlePost.Operations
 {
     class DeleteOperation : Operation
     {

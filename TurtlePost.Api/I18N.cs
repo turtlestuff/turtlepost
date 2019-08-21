@@ -7,6 +7,9 @@ using System.Text.Json;
 
 namespace TurtlePost
 {
+    /// <summary>
+    /// Singleton class that provides translation support for TurtlePost.
+    /// </summary>
     public class I18N
     {
         I18N()
@@ -17,11 +20,10 @@ namespace TurtlePost
 
             var culture = CultureInfo.CurrentUICulture;
             
-            // Loop through cultures to populate translations list. It'll loop through the current UI culture's parents
-            // until it hits invariant culture (the topmost culture). For each culture, it'll try to find a translation
-            // with the name of the culture, fill in as many translation keys as it can, and continue to the parent
-            // culture. That way, most translations can be culture-neutral ('de', 'nl') and if necessary certain
-            // culture-specific translations can be added.
+            // Loop through cultures to populate translations list. It'll loop through the current UI culture's parents until it hits invariant culture
+            // (the topmost culture). For each culture, it'll try to find a translation with the name of the culture, fill in as many translation keys as it can,
+            // and continue to the parent culture. That way, most translations can be culture-neutral ('de', 'nl') and, if necessary, certain culture-specific
+            // translations can be added.
             while (true)
             {
                 try
@@ -61,16 +63,25 @@ namespace TurtlePost
             localizations = dict.ToImmutableDictionary();
         }
 
+        /// <summary>
+        /// Gets an instance of the class.
+        /// </summary>
         public static I18N TR { get; } = new I18N();
         
+        /// <summary>
+        /// Gets the translation for the specified key. If the key is not found, they key itself will be returned.
+        /// </summary>
+        /// <param name="key">The key to find a translation for.</param>
         public string this[string key] => localizations.ContainsKey(key) ? localizations[key] : key;
+        
+        /// <summary>
+        /// Gets the translation for a specified key and formats it using the supplied parameters. If the key is not found, they key itself will be returned.
+        /// </summary>
+        /// <param name="key">The key to find a translation for.</param>
+        /// <param name="values">The values to format the translation with.</param>
         public string this[string key, params object[] values] =>
             localizations.ContainsKey(key) ? string.Format(localizations[key], values) : key;
 
         readonly ImmutableDictionary<string, string> localizations;
-
-        static void InsertResources(CultureInfo culture, Dictionary<string, string> dict)
-        {
-        }
     }
 }

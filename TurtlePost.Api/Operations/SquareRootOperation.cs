@@ -2,9 +2,11 @@
 
 namespace TurtlePost.Operations
 {
-    public class SquareRootOperation : UnaryOperation<double, double>
+    class SquareRootOperation : UnaryOperation<double, double>
     {
-        SquareRootOperation(){ }
+        SquareRootOperation()
+        {
+        }
         
         public static SquareRootOperation Instance { get; } = new SquareRootOperation();
 

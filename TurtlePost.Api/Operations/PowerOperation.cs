@@ -2,9 +2,11 @@
 
 namespace TurtlePost.Operations
 {
-    public class PowerOperation : BinaryOperation<double,double,double>
+    class PowerOperation : BinaryOperation<double,double,double>
     {
-        PowerOperation() { }
+        PowerOperation()
+        {
+        }
         
         public static PowerOperation Instance { get; } = new PowerOperation();
 

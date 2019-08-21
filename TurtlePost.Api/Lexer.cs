@@ -1,18 +1,20 @@
 using System;
 using System.Buffers;
-using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using TurtlePost.Operations;
-using static TurtlePost.I18N;
 
 namespace TurtlePost
 {
     public partial class Interpreter
     {
+        /// <summary>
+        /// Continues reading text until the next specified delimiter or EOF. If no delimiter is specified, any whitespace character will mark the end.
+        /// </summary>
+        /// <param name="eof">Indicates whether reading was terminated by EOF.</param>
+        /// <param name="c">The delimiter to stop reading at. If no value is specified, any whitespace character will be a delimiter.</param>
+        /// <returns>The span of text that is returned. The delimiter that was reached is not part of the span.</returns>
         ReadOnlySpan<char> ReadToNextDelimiter(out bool eof, char? c = null)
         {
             eof = false;
@@ -32,6 +34,8 @@ namespace TurtlePost
         void LexNumber(ref Diagnostic d)
         {
             var buffer = ReadToNextDelimiter(out _);
+            
+            // We have to check for 2PI here, since the main lexer loop will call this method after reading the 2.
             if (buffer.Equals("2PI", StringComparison.Ordinal))
             {
                 UserStack.Push(Math.PI * 2);
@@ -43,7 +47,7 @@ namespace TurtlePost
             else
                 d = Diagnostic.Translate("TP0007", DiagnosticType.Error, buffer);
         }
-        
+
         void LexList(ref Diagnostic d)
         {
             var buffer = ReadToNextDelimiter(out var eof, '}');
@@ -51,23 +55,23 @@ namespace TurtlePost
             {
                 d = Diagnostic.Translate("TP0011", DiagnosticType.Error, buffer);
             }
-            
+
             var list = new List();
 
-            // If the length is 2, the input must be {}; thus, we shouldn't try and parse anything. 
-            // Likewise, if there is only whitespace between the braces, we know the list is empty.
+            // If the length is 1, the input must be '{' (the closing brace is not included); thus, we shouldn't try and parse anything. 
+            // Likewise, if there is only whitespace after the first brace, we know the list is empty.
             if (buffer.Length > 1 && !buffer[1..].IsWhiteSpace())
-                new Interpreter { UserStack = list }.Interpret(buffer[1..].ToString(), ref d,
-                    new InterpretationOptions { DisallowOperations = true, HideDiagnostics = true, HideStack = true });
-            
+                new Interpreter(Operations, list).Interpret(buffer[1..].ToString(), ref d,
+                    new InterpretationOptions {DisallowOperations = true, HideDiagnostics = true, HideStack = true});
+
             UserStack.Push(list);
         }
-
 
         Operation? LexOperation(ref Diagnostic d, bool allowOperations)
         {
             var buffer = ReadToNextDelimiter(out _);
-            d.Span = buffer;
+            
+            // We need to check for constants in here since these can't really be special cased.
             switch (buffer)
             {
                 case var _ when buffer.Equals("true", StringComparison.Ordinal):
@@ -86,11 +90,13 @@ namespace TurtlePost
                     UserStack.Push(Math.E);
                     return null;
                 default:
+                    // If operations aren't allowed, error. We can't do this earlier since constants are checked in this method as well.
                     if (!allowOperations)
                     {
                         d = Diagnostic.Translate("TP0012", DiagnosticType.Error, buffer);
                         return null;
                     }
+
                     if (!Operations.TryGetValue(buffer.ToString(), out var op))
                     {
                         d = Diagnostic.Translate("TP0004", DiagnosticType.Error, buffer);
@@ -102,15 +108,14 @@ namespace TurtlePost
 
         void LexString(ref Diagnostic d)
         {
-            // This function shifts a sub-slice of the buffer to the left a specified amount of times.
-            // The sub-slice starts at the given start index and continues to the end (we don't need anything more).
-            // The goal is to overwrite some leftover data after we collapse the escape sequence into 1 (or 2) chars.
-            // It does this in a few steps:
+            // This function shifts a sub-slice of the buffer to the left a specified amount of times. The sub-slice starts at the given start index and
+            // continues to the end (we don't need anything more).
+            // The goal is to overwrite some leftover data after we collapse the escape sequence into 1 (or 2) chars. It does this in a few steps:
             // - It takes a slice of the buffer from the given starting index to the end
             // - It subtracts our shift amount from the start index, giving us the index we intend to start writing to
             // - It uses CopyTo to actually write the sub-slice into the original buffer
-            // - It slices off leftover data from the end; since we shifted over 'amount' times, there will be 'amount'
-            // indices of "garbage data" left over on the end of the buffer that we need to remove.
+            // - It slices off leftover data from the end; since we shifted over 'amount' times, there will be 'amount' indices of "garbage data" left over on
+            // the end of the buffer that we need to remove.
             static void ShiftBufferSegment(ref Span<char> buffer, int startIndex, int amount)
             {
                 buffer[startIndex..].CopyTo(buffer[(startIndex - amount)..]);
@@ -120,10 +125,9 @@ namespace TurtlePost
             Enumerator.MoveNext(); // Skip " character
             var sourceString = ReadToNextDelimiter(out _, '"');
 
-            // Before we push the input string to the stack, we need to parse escape sequences. Since the buffer we 
-            // get from the source is read-only (strings are immutable), we will need to make our own temporary mutable
-            // buffer. It needs to be as long as the source string, but when we collapse the escape sequences,
-            // the string becomes shorter, so we will have to trim off the leftover space as we go.
+            // Before we push the input string to the stack, we need to parse escape sequences. Since the buffer we get from the source is read-only
+            // (strings are immutable), we will need to make our own temporary mutable buffer. It needs to be as long as the source string, but when we collapse
+            // the escape sequences, the string becomes shorter, so we will have to trim off the leftover space as we go.
 
             // Allocate our buffer. If the string is too big for the stack, use the array pool.
             char[]? rentedArr = default;
@@ -177,9 +181,8 @@ namespace TurtlePost
                         buffer[i] = '\v';
                         break;
                     case 'u':
-                        // 'u' denotes an escape of the form \uXXXX, where XXXX is a UTF-16 code unit in hex. We need
-                        // to capture those 4 characters that make up the hex digit, parse it, and reinterpret it as 
-                        // a character. 
+                        // 'u' denotes an escape of the form \uXXXX, where XXXX is a UTF-16 code unit in hex. We need to capture those 4 characters that make up
+                        // the hex digit, parse it, and reinterpret it as  a character. 
                         if (!ushort.TryParse(buffer[(i + 2)..(i + 6)], NumberStyles.HexNumber,
                             CultureInfo.InvariantCulture, out var utf16CodeUnit))
                         {
@@ -188,19 +191,18 @@ namespace TurtlePost
                                 ArrayPool<char>.Shared.Return(rentedArr);
                             return;
                         }
-                        
+
                         buffer[i] = (char) utf16CodeUnit;
 
-                        // Shift the buffer left 5 to cover up the 'u' and the hex digit. Since we overwrote the
-                        // backslash with the code unit, we shouldn't discard it.
+                        // Shift the buffer left 5 to cover up the 'u' and the hex digit. Since we overwrote the backslash with the code unit, we shouldn't
+                        // discard it.
                         ShiftBufferSegment(ref buffer, i + 6, 5);
                         continue;
                     case 'U':
-                        // 'U' is similar in form to 'u', but parses a UTF-32 code unit instead (with an 8 digit long
-                        // hex string to match). Because a UTF-32 code unit may or may not correspond to a UTF-16
-                        // surrogate pair, we will have to shift either 8 or 9 characters over, depending on how many
-                        // UTF-16 code units we end up writing.
-                        if (!uint.TryParse(buffer[(i + 2)..(i + 10)], NumberStyles.HexNumber, 
+                        // 'U' is similar in form to 'u', but parses a UTF-32 code unit instead (with an 8 digit long hex string to match). Because a UTF-32
+                        // code unit may or may not correspond to a UTF-16 surrogate pair, we will have to shift either 8 or 9 characters over, depending on how
+                        // many UTF-16 code units we end up writing.
+                        if (!uint.TryParse(buffer[(i + 2)..(i + 10)], NumberStyles.HexNumber,
                             CultureInfo.InvariantCulture, out var utf32CodeUnit))
                         {
                             d = Diagnostic.Translate("TP0008", DiagnosticType.Error, sourceString, i + 2);
@@ -209,24 +211,21 @@ namespace TurtlePost
                             return;
                         }
 
-                        // We will use Encoding to convert a UTF-32 code unit to UTF-16 code units and write it to the 
-                        // buffer, starting from the current index (which is the backslash).
-
+                        // We will use Encoding to convert a UTF-32 code unit to UTF-16 code units and write it to the buffer, starting from the current index
+                        // (which is the backslash).
                         ReadOnlySpan<byte> bytes;
                         unsafe
                         {
-                            // Encoding wants a ReadOnlySpan<byte> to represent our input, so we need to convert
-                            // our UInt32 to bytes. We can just reinterpret it as a 4 byte span.
+                            // Encoding wants a ReadOnlySpan<byte> to represent our input, so we need to convert our UInt32 to bytes. We can just reinterpret it
+                            // as a 4 byte span.
                             bytes = new ReadOnlySpan<byte>(Unsafe.AsPointer(ref utf32CodeUnit), sizeof(uint));
                         }
 
-                        // We need to store the amount of characters written so that we trim off the correct number of
-                        // garbage characters; if we write more than 1 character, we need to account for that (or else
-                        // it gets discarded and the wrong character sequence is written).
+                        // We need to store the amount of characters written so that we trim off the correct number of garbage characters; if we write more than
+                        // 1 character, we need to account for that (or else it gets discarded and the wrong character sequence is written).
                         var charsWritten = Encoding.UTF32.GetChars(bytes, buffer);
 
-                        // Since charsWritten is always 1 or 2, we can subtract it from 10 to see how many garbage
-                        // characters we have to trim.
+                        // Since charsWritten is always 1 or 2, we can subtract it from 10 to see how many garbage characters we have to trim.
                         ShiftBufferSegment(ref buffer, i + 10, 10 - charsWritten);
                         continue;
                     default:
@@ -236,19 +235,16 @@ namespace TurtlePost
                         return;
                 }
 
-                // We have already performed the character escape; however, the character we inserted only replaces
-                // the first character of the escape sequence:
+                // We have already performed the character escape; however, the character we inserted only replaces the first character of the escape sequence:
                 // "H e l l \ n o" -> "H e l l \n n o"
-                // Since we're only changing one character, and escape sequences are multiple characters long, we need
-                // to clear away the rest of the characters in the escape sequence. We will do that by shifting the
-                // remaining contents of the buffer *over* the leftover characters from the escape sequence.
-                // Thus, the other characters in the escape sequence get overwritten and the buffer is trimmed to 
-                // correctly fit the string. See ShiftBufferSegment for info on how it works.
+                // Since we're only changing one character, and escape sequences are multiple characters long, we need to clear away the rest of the characters
+                // in the escape sequence. We will do that by shifting the remaining contents of the buffer *over* the leftover characters from the escape
+                // sequence. Thus, the other characters in the escape sequence get overwritten and the buffer is trimmed to correctly fit the string.
+                // See ShiftBufferSegment for info on how it works.
 
-                // The shifted sub-buffer should start 2 indices ahead of the current one to skip the (now replaced)
-                // backslash and the character representing the escape. We are only going to shift one space to the left
-                // since we only want to overwrite the character representing the escape, not the backslash (which got
-                // replaced with the escaped character).
+                // The shifted sub-buffer should start 2 indices ahead of the current one to skip the (now replaced) backslash and the character representing
+                // the escape. We are only going to shift one space to the left, since we only want to overwrite the character representing the escape, not the
+                // backslash (which got replaced with the escaped character).
                 ShiftBufferSegment(ref buffer, i + 2, 1);
             }
 
@@ -271,7 +267,7 @@ namespace TurtlePost
         {
             Enumerator.MoveNext(); // Skip & character
             var buffer = ReadToNextDelimiter(out _);
-            UserStack.Push(globals[buffer.ToString()]);
+            UserStack.Push(Globals[buffer.ToString()]);
         }
 
         void LexLabel(ref Diagnostic d)
@@ -283,7 +279,7 @@ namespace TurtlePost
                 return;
             }
 
-            if (!labels.TryGetValue(buffer[1..].ToString(), out var label))
+            if (!Labels.TryGetValue(buffer[1..].ToString(), out var label))
             {
                 d = Diagnostic.Translate("TP0005", DiagnosticType.Error, buffer);
                 return;

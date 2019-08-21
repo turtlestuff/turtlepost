@@ -18,6 +18,7 @@ TurtlePost supports basic types of values:
 - Strings (`"Hello"`, `"Alien \U0001F47D"`)
 - Globals (`&var`)
 - Labels (`@label`)
+- Lists (`{ "Hello" "World" 123 }`)
 - Null (`null`)
 
 A list of all operations and their functions is described [below](#operations-reference).
@@ -25,7 +26,7 @@ A list of all operations and their functions is described [below](#operations-re
 Comments are started and ended with a forward slash (`/sample comment/`).
 
 ### The Stack
-The stack is simply a 'last in, first out' buffer of objects. Typing a value expression into TurtlePost pushes that value onto the top of the stack. Operations can pop/consume values off of the top of the stack, perform operations on those values, and push new values onto the stack. The stack stores values of any type (even if operations do not work on all types). TurtlePost represents the topmost value on the stack as the one furthest to the right.
+The stack is simply a 'last in, first out' buffer of values. Typing a value expression into TurtlePost pushes that value onto the top of the stack. Operations can pop/consume values off of the top of the stack, perform operations on those values, and push new values onto the stack. The stack stores values of any type (even if operations do not work on all types). TurtlePost represents the topmost value on the stack as the one furthest to the right.
 
 ```
 > 2 /pushes 2 onto the stack/
@@ -71,12 +72,12 @@ Globals are values that represent references to other values. A global has a nam
 &var | &var2 | &var3
 ```
 
-Globals can be written to using the <kbd>write</kbd> operation. It pops a global and a value, writing the value into the global. Their value can be retrieved using the <kbd>push</kbd> operation, which pops a global and pushes its value. Even if there are no remaining references to a global on the stack, it is still there and its value can be referred to at a later time.
+Globals can be written to using the <kbd>write</kbd> operation. It pops a global and a value, writing the value into the global. Their value can be retrieved using the <kbd>read</kbd> operation, which pops a global and pushes its value. Even if there are no remaining references to a global on the stack, it is still there and its value can be referred to at a later time.
 ```
 > 5 &var write
 /Globals: &var = 5/
 
-> &var push
+> &var read
 /Globals: &var = 5/
 5
 ```
@@ -112,19 +113,33 @@ The <kbd>call</kbd> operation pops a label, saves the current source location to
 
 Note that subroutines will still be executed as normal code if the interpreter reaches the subroutine's code. Since the call stack would be empty at this point, the `ret` operation would cause an error. Thus, it is advised to place all subroutines after an `@end jump` at the end of the file, so that the interpreter does not attempt to run subroutines with an empty call stack.
 
+### Lists
+Lists are values which themselves contain multiple values. Lists function as both arrays and stacks; specific indices can be read from and written to (<kbd>get</kbd> and <kbd>set</kbd>), and items can be added and removed from from the top of the list (<kbd>push</kbd> and <kbd>pop</kbd>). 
+
+List literals are declared with a set of curly braces. Initial values can be added to the list literal, each separated by a space. Operations are not allowed inside of a list literal. The first value is added at index 0 and subsequent values are added at increasing indices. Pushing and popping values happens in the same order as they do on the stack.
+```
+> { "a" "b" "c" } &var write
+
+> &var read 0 get
+"a"
+
+> &var read "d" push &var read
+{ "a" "b" "c" "d" }
+```
+
 ## Operations Reference
-`add sub mul div mod ceil round floor sin cos tan write push concat print println input cls width height cursor dup drop swap over not and or xor eq gt lt gte lte string parse jump call jumpif callif ret exit nop help copying`
+`add sub mul div mod sqrt pow ceil round floor sin cos tan read write concat pop push get set del print println input cls width height cursor dup drop swap over not and or xor eq gt lt gte lte string parse jump call jumpif callif ret typeof exit nop help copying`
 
 ### Arithmetic
-| Name             | Operation                                                                                 |
-|:----------------:|-------------------------------------------------------------------------------------------|
-| <kbd>add</kbd>   | Pops two numbers, adds the top to the bottom, and pushes the resulting sum.               |
-| <kbd>sub</kbd>   | Pops two numbers, subtracts the top from the bottom, and pushes the resulting difference. |
-| <kbd>mul</kbd>   | Pops two numbers, multiplies the top by the bottom, and pushes the resulting product.     |
-| <kbd>div</kbd>   | Pops two numbers, divides the top by the bottom, and pushes the resulting quotient.       |
-| <kbd>mod</kbd>   | Pops two numbers, divides the top by the bottom, and pushes the resulting remainder.      |
-| <kbd>sqrt</kbd>  | Pops a number, pushes the resulting square root                                            |
-| <kbd>pow</kbd>   | Pops a number, pushes the resulting exponent  |
+| Name             | Operation                                                                                                             |
+|:----------------:|-----------------------------------------------------------------------------------------------------------------------|
+| <kbd>add</kbd>   | Pops two numbers, adds the top to the bottom, and pushes the resulting sum.                                           |
+| <kbd>sub</kbd>   | Pops two numbers, subtracts the top from the bottom, and pushes the resulting difference.                             |
+| <kbd>mul</kbd>   | Pops two numbers, multiplies the top by the bottom, and pushes the resulting product.                                 |
+| <kbd>div</kbd>   | Pops two numbers, divides the top by the bottom, and pushes the resulting quotient.                                   |
+| <kbd>mod</kbd>   | Pops two numbers, divides the top by the bottom, and pushes the resulting remainder.                                  |
+| <kbd>sqrt</kbd>  | Pops a number, calculates its square root, and pushes the resulting root extraction.                                  |
+| <kbd>pow</kbd>   | Pops two numbers, raises the second number to the power of the first number, and pushes the resulting exponentiation. |
 
 ### Rounding
 | Name             | Operation                                   |
@@ -140,22 +155,39 @@ Note that subroutines will still be executed as normal code if the interpreter r
 | <kbd>cos</kbd>   | Pops a number and pushes its cosine.  |
 | <kbd>tan</kbd>   | Pops a number and pushes its tangent. |
 
+### Constants
+| Name             | Operation                             |
+|:----------------:|---------------------------------------|
+| <kbd>PI</kbd>    | Pushes π to the stack.                |
+| <kbd>2PI</kbd>   | Pushes 2π to the stack.               |
+| <kbd>E</kbd>     | Pushes *e* to the stack.              |
+
 ### Globals
 | Name             | Operation                                                          |
 |:----------------:|--------------------------------------------------------------------|
-| <kbd>write</kbd> | Pops a global and any value, and writes the value into the global. |
-| <kbd>push</kbd>  | Pops a global and pushes the value of the global.                  |
+| <kbd>write</kbd> | Pops a global and a value, and writes the value into the global.   |
+| <kbd>read</kbd>  | Pops a global and pushes the value of the global.                  |
 
 ### Strings
 | Name              | Operation                                                                             |
 |:-----------------:|---------------------------------------------------------------------------------------|
 | <kbd>concat</kbd> | Pops two strings, concatenates the bottom with the top, and pushes the concatenation. |
 
+
+### Lists
+| Name            | Operation                                                                                                                         |
+|:---------------:|-----------------------------------------------------------------------------------------------------------------------------------|
+| <kbd>push</kbd> | Pops and value and a list, and pushes the value to the top of the list.                                                           |
+| <kbd>pop</kbd>  | Pops a list, removes an item from the top of the list, and pushes the removed item.                                               |
+| <kbd>get</kbd>  | Pops a number and a list, truncates the number, and pushes the item in the list at the given index.                               |
+| <kbd>set</kbd>  | Pops a number, an value, and a list, truncates the number, and sets the item in the list at the given index to the given value.   |
+| <kbd>del</kbd>  | Pops a number and a list, truncates the number, and deletes the item at the given index index from the list.                      |
+
 ### I/O
 | Name               | Operation                                                                                                            |
 |:------------------:|----------------------------------------------------------------------------------------------------------------------|
-| <kbd>print</kbd>   | Pops any value and writes it to the standard output.                                                                 |
-| <kbd>println</kbd> | Pops any value, writes it to the standard output, and writes an additional newline.                                  |
+| <kbd>print</kbd>   | Pops a value and writes it to the standard output.                                                                   |
+| <kbd>println</kbd> | Pops a value, writes it to the standard output, and writes an additional newline.                                    |
 | <kbd>input</kbd>   | Reads a line of text from the standard input and pushes the string.                                                  |
 | <kbd>cls</kbd>     | Clears the terminal.                                                                                                 |
 | <kbd>width</kbd>   | Pushes the amount of characters the current terminal can show horizontally.                                          |
@@ -168,7 +200,7 @@ Note that subroutines will still be executed as normal code if the interpreter r
 | <kbd>dup</kbd>  | Pops a value and pushes it twice.                                                                                                    |
 | <kbd>drop</kbd> | Pops a value, discarding it.                                                                                                         |
 | <kbd>swap</kbd> | Pops two values and pushes them back in reverse order.                                                                               |
-| <kbd>over</kbd> | Pops two values, and pushes the bottom, top, and bottom value again. This effectively pushes the second topmost object on the stack. |
+| <kbd>over</kbd> | Pops two values, and pushes the bottom, top, and bottom value again. This effectively pushes the second topmost value on the stack.  |
 
 ### Boolean Logic
 | Name            | Operation                                                              |
@@ -205,17 +237,11 @@ Note that subroutines will still be executed as normal code if the interpreter r
 ### Miscellaneous
 | Name               | Operation                                                                           |
 |:------------------:|-------------------------------------------------------------------------------------|
+| <kbd>typeof</kbd>  | Pops a value and pushes the name of the value's type as a string.                   |
 | <kbd>exit</kbd>    | Exits the process the interpreter is running in with exit code 0.                   |
 | <kbd>nop</kbd>     | Performs no operation.                                                              |
 | <kbd>help</kbd>    | Prints out a list of all operations the interpreter is configured to use.           |
 | <kbd>copying</kbd> | Prints out information about redistribution, warranty, and licensing of TurtlePost. |
-
-#### Constants
-| Name             | Operation                             |
-|:----------------:|---------------------------------------|
-| <kbd>PI</kbd>    | Pushes π to the stack.                |
-| <kbd>2PI</kbd>   | Pushes 2π to the stack.               |
-| <kbd>E</kbd>     | Pushes e to the stack.                |
 
 
 ## Localizations

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace TurtlePost.Operations
+﻿namespace TurtlePost.Operations
 {
     class GetOperation : Operation
     {

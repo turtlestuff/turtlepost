@@ -1,118 +1,148 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
-using System.Reflection;
 using TurtlePost.Operations;
 using static TurtlePost.I18N;
 using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
 
 namespace TurtlePost
 {
+    /// <summary>
+    /// The TurtlePost interpreter. 
+    /// </summary>
     public partial class Interpreter
     {
-        public Interpreter()
+        /// <summary>
+        /// Creates a new interpreter.
+        /// </summary>
+        public Interpreter(Dictionary<string, Operation>? operations = null, List? list = null)
         {
             // Do the regex compilation early to minimize perf hit on first evaluation
             LabelRegex.Match("");
+
+            UserStack = list ?? new List();
+
+            Operations = operations ?? new Dictionary<string, Operation>
+            {
+                // Arithmetic
+                { "add",     AddOperation.Instance },
+                { "sub",     SubOperation.Instance },
+                { "mul",     MultiplyOperation.Instance },
+                { "div",     DivideOperation.Instance },
+                { "mod",     ModuloOperation.Instance },
+                { "sqrt",    SquareRootOperation.Instance },
+                { "pow",     PowerOperation.Instance }, 
+                
+                // Rounding
+                { "ceil",    CeilingOperation.Instance },
+                { "round",   RoundOperation.Instance },
+                { "floor",   FloorOperation.Instance },
+                
+                // Trigonometric
+                { "sin",     SineOperation.Instance },
+                { "cos",     CosineOperation.Instance },
+                { "tan",     TangentOperation.Instance },
+
+                // Globals
+                { "read",    ReadOperation.Instance },
+                { "write",   WriteOperation.Instance },
+
+                // Strings
+                { "concat",  ConcatOperation.Instance },
+                
+                // Lists
+                { "pop",     PopOperation.Instance },
+                { "push",    PushOperation.Instance },
+                { "get",     GetOperation.Instance },
+                { "set",     SetOperation.Instance },
+                { "del",     DeleteOperation.Instance },
+                
+                // Terminal
+                { "print",   PrintOperation.Instance },
+                { "println", PrintLineOperation.Instance },
+                { "input",   InputOperation.Instance },
+                { "cls",     ClearOperation.Instance },
+                { "width",   WidthOperation.Instance },
+                { "height",  HeightOperation.Instance },
+                { "cursor",  CursorOperation.Instance },
+
+                // Stack manipulation
+                { "dup",     DuplicateOperation.Instance },
+                { "drop",    DropOperation.Instance  },
+                { "swap",    SwapOperation.Instance },
+                { "over",    OverOperation.Instance },
+                
+                // Boolean logic
+                { "not",     NotOperation.Instance },
+                { "and",     AndOperation.Instance },
+                { "or",      OrOperation.Instance },
+                { "xor",     XorOperation.Instance },
+                
+                // Comparisons
+                { "eq",      EqualsOperation.Instance },
+                { "gt",      GreaterThanOperation.Instance },
+                { "lt",      LessThanOperation.Instance },
+                { "gte",     GreaterThanOrEqualToOperation.Instance },
+                { "lte",     LessThanOrEqualToOperation.Instance },
+                
+                // Conversions
+                { "string",  StringOperation.Instance },
+                { "parse",   ParseOperation.Instance },
+
+                // Control flow
+                { "jump",    JumpOperation.Instance },
+                { "call",    CallOperation.Instance },
+                { "jumpif",  JumpIfOperation.Instance },
+                { "callif",  CallIfOperation.Instance },
+                { "ret",     ReturnOperation.Instance },
+
+                // Miscellaneous 
+                { "typeof",  TypeOfOperation.Instance }, 
+                { "exit",    ExitOperation.Instance },
+                { "nop",     NoOperation.Instance },
+                { "help",    HelpOperation.Instance },
+                { "copying", CopyingOperation.Instance },
+            };
         }
         
+        /// <summary>
+        /// An enumerator.
+        /// </summary>
         public MovableStringEnumerator Enumerator { get; private set; } = default!;
         
+        /// <summary>
+        /// The code being currently interpreted.
+        /// </summary>
         public string Code { get; private set; } = "";
         
+        /// <summary>
+        /// Gets a collection that represents locations in the source where a call was performed.
+        /// </summary>
         public Stack<int> CallStack { get; } = new Stack<int>();
         
-        public List UserStack { get; private set; } = new List();
+        /// <summary>
+        /// Gets a collection that represents the objects that are on the stack.
+        /// </summary>
+        public List UserStack { get; }
         
-        public Dictionary<string, Operation> Operations { get; } = new Dictionary<string, Operation>
-        {
-            // Arithmetic
-            { "add",     AddOperation.Instance },
-            { "sub",     SubOperation.Instance },
-            { "mul",     MultiplyOperation.Instance },
-            { "div",     DivideOperation.Instance },
-            { "mod",     ModuloOperation.Instance },
-            { "sqrt",    SquareRootOperation.Instance },
-            { "pow",     PowerOperation.Instance }, 
-            
-            // Rounding
-            { "ceil",    CeilingOperation.Instance },
-            { "round",   RoundOperation.Instance },
-            { "floor",   FloorOperation.Instance },
-            
-            // Trigonometric
-            { "sin",     SineOperation.Instance },
-            { "cos",     CosineOperation.Instance },
-            { "tan",     TangentOperation.Instance },
+        /// <summary>
+        /// Gets the globals that have been defined.
+        /// </summary>
+        public GlobalBag Globals { get; } = new GlobalBag();
 
-            // Globals
-            { "read",    ReadOperation.Instance },
-            { "write",   WriteOperation.Instance },
+        /// <summary>
+        /// Gets the labels that have been defined.
+        /// </summary>
+        public LabelBag Labels { get; } = new LabelBag();
 
-            // Strings
-            { "concat",  ConcatOperation.Instance },
-            
-            // Lists
-            { "pop",     PopOperation.Instance },
-            { "push",    PushOperation.Instance },
-            { "get",     GetOperation.Instance },
-            { "set",     SetOperation.Instance },
-            { "del",     DeleteOperation.Instance },
-
-            
-            // Terminal
-            { "print",   PrintOperation.Instance },
-            { "println", PrintLineOperation.Instance },
-            { "input",   InputOperation.Instance },
-            { "cls",     ClearOperation.Instance },
-            { "width",   WidthOperation.Instance },
-            { "height",  HeightOperation.Instance },
-            { "cursor",  CursorOperation.Instance },
-
-            // Stack manipulation
-            { "dup",     DuplicateOperation.Instance },
-            { "drop",    DropOperation.Instance  },
-            { "swap",    SwapOperation.Instance },
-            { "over",    OverOperation.Instance },
-            
-            // Boolean logic
-            { "not",     NotOperation.Instance },
-            { "and",     AndOperation.Instance },
-            { "or",      OrOperation.Instance },
-            { "xor",     XorOperation.Instance },
-            
-            // Comparisons
-            { "eq",      EqualsOperation.Instance },
-            { "gt",      GreaterThanOperation.Instance },
-            { "lt",      LessThanOperation.Instance },
-            { "gte",     GreaterThanOrEqualToOperation.Instance },
-            { "lte",     LessThanOrEqualToOperation.Instance },
-            
-            // Conversions
-            { "string",  StringOperation.Instance },
-            { "parse",   ParseOperation.Instance },
-
-            // Control flow
-            { "jump",    JumpOperation.Instance },
-            { "call",    CallOperation.Instance },
-            { "jumpif",  JumpIfOperation.Instance },
-            { "callif",  CallIfOperation.Instance },
-            { "ret",     ReturnOperation.Instance },
-
-            // Miscellaneous 
-            { "typeof",  TypeOfOperation.Instance }, 
-            { "exit",    ExitOperation.Instance },
-            { "nop",     NoOperation.Instance },
-            { "help",    HelpOperation.Instance },
-            { "copying", CopyingOperation.Instance },
-        };
+        /// <summary>
+        /// Gets the operations that this interpreter can use.
+        /// </summary>
+        public Dictionary<string, Operation> Operations { get; set; }
 
         static readonly Regex LabelRegex = new Regex(@"@(\w)*:", RegexOptions.Compiled);
-        
-        LabelBag labels = new LabelBag();
-        
-        readonly GlobalBag globals = new GlobalBag();
 
         bool CheckDiagnostic(in Diagnostic d, InterpretationOptions options)
         {
@@ -135,13 +165,31 @@ namespace TurtlePost
             }
         }
 
+        /// <summary>
+        /// A structure that represents options to pass to the interpreter.
+        /// </summary>
         public struct InterpretationOptions
         {
+            /// <summary>
+            /// Gets or sets whether the <see cref="Interpreter.UserStack"/> should be printed to the console.
+            /// </summary>
             public bool HideStack { get; set; }
+            /// <summary>
+            /// Gets or sets whether operations should be allowed to be parsed.
+            /// </summary>
             public bool DisallowOperations { get; set; }
+            /// <summary>
+            /// Gets or sets whether diagnostics should be printed to the console.
+            /// </summary>
             public bool HideDiagnostics { get; set; }
         }
-
+        
+        /// <summary>
+        /// Interprets the specified code.
+        /// </summary>
+        /// <param name="code">The code to interpret.</param>
+        /// <param name="diagnostic">A diagnostic that has information about errors that occur while interpreting.</param>
+        /// <param name="options">The options to give to the interpreter</param>
         public void Interpret(string code, ref Diagnostic diagnostic, InterpretationOptions options = default)
         {
 #if DEBUG
@@ -155,7 +203,7 @@ namespace TurtlePost
                 return;
 #if DEBUG
             if (!options.HideStack)
-                Utils.PrintLabels(labels);
+                Utils.PrintLabels(Labels);
 #endif
             try
             {
@@ -207,13 +255,13 @@ namespace TurtlePost
             {
 #if DEBUG
                 sw.Stop();
-                Utils.PrintGlobals(globals);
+                Utils.PrintGlobals(Globals);
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine(TR["executionTime"], sw.Elapsed.TotalMilliseconds.ToString());
                 Console.ResetColor();
 #endif
                 Utils.PrintStack(UserStack);
-                labels.Clear();
+                Labels.Clear();
                 CallStack.Clear();
             }
 
@@ -223,15 +271,15 @@ namespace TurtlePost
         {
             Enumerator = new MovableStringEnumerator(code);
             Code = code;
-            labels.Clear();
-            labels.Add("end", new Label("end", code.Length));
+            Labels.Clear();
+            Labels.Add("end", new Label("end", code.Length));
             
             // Search for labels in code
             var matches = LabelRegex.Matches(code);
             foreach (var i in (IEnumerable<Match>) matches)
             {
                 var s = i.Value[1..^1];
-                if (!labels.TryAdd(s, new Label(s, i.Index)))
+                if (!Labels.TryAdd(s, new Label(s, i.Index)))
                 {
                     d = Diagnostic.Translate("TP0006", DiagnosticType.Error, i.Value, i.Index);
                     return;
