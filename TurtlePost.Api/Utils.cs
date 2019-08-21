@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -120,6 +121,11 @@ namespace TurtlePost
             }
         }
 
-        public static string GetTypeName(Type? type) => type == typeof(double) ? "number" : type?.Name.ToLower() ?? "null";
+        public static string GetTypeName(Type? type)
+        {
+            if (type == typeof(double)) return "number";
+            if (type == typeof(Stack<object?>)) return "list";
+            return type?.Name.ToLower() ?? "null";
+        }
     }
 }
