@@ -24,7 +24,7 @@ namespace TurtlePost
                 // Set up the console
                 Console.TreatControlCAsInput = true;
 
-                DirectInterpreter = new Interpreter();
+                directInterpreter = new Interpreter();
 
                 while (true)
                 {
@@ -41,26 +41,26 @@ namespace TurtlePost
                         else if (!char.IsControl(key.KeyChar))
                         {
                             Console.Write(key.KeyChar);
-                            if (CaretPosition == CurrentInput.Length)
+                            if (caretPosition == currentInput.Length)
                             {
-                                CurrentInput.Append(key.KeyChar);
-                                CaretPosition++;
+                                currentInput.Append(key.KeyChar);
+                                caretPosition++;
                             }
                             else
                             {
-                                CurrentInput.Insert(CaretPosition, key.KeyChar);
-                                CaretPosition++;
+                                if (!insertKey) currentInput.Insert(caretPosition, key.KeyChar);
+                                else currentInput[caretPosition] = key.KeyChar;
+                                caretPosition++;
                             }
                         }
                         (int oldCX, int oldCY) = (Console.CursorLeft, Console.CursorTop);
                         Console.SetCursorPosition(initCX, initCY);
-                        Console.Write(CurrentInput+" ");
+                        Console.Write(currentInput+" ");
                         Console.SetCursorPosition(oldCX, oldCY);
-                        Debug.WriteLine(CurrentInput.ToString());
-                    } while (!InputComplete);
+                    } while (!inputComplete);
 
-                    CurrentInput.Clear();
-                    InputComplete = false;
+                    currentInput.Clear();
+                    inputComplete = false;
 
                     if (d.Type != DiagnosticType.None)
                         d = default;

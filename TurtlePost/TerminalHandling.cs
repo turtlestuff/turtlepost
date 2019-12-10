@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text;
 using static TurtlePost.I18N;
 
@@ -22,21 +23,22 @@ namespace TurtlePost
             }
         }
 
-        static Interpreter DirectInterpreter = default!;
-        static bool InputComplete;
-        static StringBuilder CurrentInput = new StringBuilder(256); 
-        static int CaretPosition = 0;
+        static Interpreter directInterpreter = default!;
+        static bool inputComplete;
+        static StringBuilder currentInput = new StringBuilder(256); 
+        static int caretPosition = 0;
+        static bool insertKey = false;
 
         static ImmutableDictionary<KeyPressed, KeyResponse> Keys = new Dictionary<KeyPressed, KeyResponse>
         {
             {
                 new KeyPressed(ConsoleKey.D, ConsoleModifiers.Control), (ref Diagnostic d) =>
                 {
-                    if (CurrentInput.Length == 0)
+                    if (currentInput.Length == 0)
                     {
                         Console.WriteLine("exit");
-                        DirectInterpreter.Interpret("exit", ref d);
-                        InputComplete = true;
+                        directInterpreter.Interpret("exit", ref d);
+                        inputComplete = true;
                     }
                     else
                     {
@@ -50,16 +52,16 @@ namespace TurtlePost
                 {
                     //Interpret the current line
                     Console.WriteLine();
-                    if (CurrentInput.Length != 0) 
-                        DirectInterpreter.Interpret(CurrentInput.ToString(), ref d);
-                    CaretPosition = 0;
-                    InputComplete = true;
+                    if (currentInput.Length != 0) 
+                        directInterpreter.Interpret(currentInput.ToString(), ref d);
+                    caretPosition = 0;
+                    inputComplete = true;
                 }
             },
             {
                 new KeyPressed(ConsoleKey.Backspace, 0), (ref Diagnostic _) =>
                 {
-                    if (CurrentInput.Length == 0)
+                    if (currentInput.Length == 0)
                     {
                         //Nothing has been typed
                         Console.Beep();
@@ -68,8 +70,8 @@ namespace TurtlePost
                     {
                         //Back up the caret and replace it with a space
                         Console.Write('\b');
-                        CaretPosition--;
-                        CurrentInput = CurrentInput.Remove(CaretPosition, 1);
+                        caretPosition--;
+                        currentInput = currentInput.Remove(caretPosition, 1);
                     }
                 }
             },
@@ -78,19 +80,19 @@ namespace TurtlePost
                 {
                     //Reset the input buffer
                     Console.WriteLine();
-                    if (CurrentInput.Length == 0)
+                    if (currentInput.Length == 0)
                     {
                         //Print a message stating how to exit
                         Console.WriteLine(TR["exitExplanation"]);
                     }
 
-                    InputComplete = true;
+                    inputComplete = true;
                 }
             },
             {
                 new KeyPressed(ConsoleKey.LeftArrow, 0), (ref Diagnostic _) =>
                 {
-                    if (CurrentInput.Length == 0)
+                    if (currentInput.Length == 0)
                     {
                         //Nothing has been typed
                         Console.Beep();
@@ -99,14 +101,14 @@ namespace TurtlePost
                     {
                         //Back up the caret
                         Console.Write('\b');
-                        CaretPosition--;
+                        caretPosition--;
                     }
                 } 
             },
             {
                 new KeyPressed(ConsoleKey.RightArrow, 0), (ref Diagnostic _) =>
                 {
-                    if (CaretPosition == CurrentInput.Length)
+                    if (caretPosition == currentInput.Length)
                     {
                         //We're already at the end!
                         Console.Beep();
@@ -115,9 +117,30 @@ namespace TurtlePost
                     {
                         //Advance the caret(Doesn't matter we're erasing a character, we'll write it all again anyway.)
                         Console.Write(' ');
-                        CaretPosition++;
+                        caretPosition++;
                     }
                 } 
+            },
+            {
+                new KeyPressed(ConsoleKey.Delete, 0), (ref Diagnostic _) =>
+                {
+                    if (caretPosition == currentInput.Length)
+                    {
+                        //We're at the end already!
+                        Console.Beep();
+                    }
+                    else
+                    {
+                        currentInput.Remove(caretPosition, 1);
+                    }
+                } 
+            },
+            {
+                new KeyPressed(ConsoleKey.Insert, 0), (ref Diagnostic _) =>
+                {
+                    insertKey = !insertKey;
+                    Console.CursorSize = insertKey ? 100 : 25;
+                }
             }
         }.ToImmutableDictionary();
     }
