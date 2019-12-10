@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using static TurtlePost.I18N;
@@ -28,6 +29,7 @@ namespace TurtlePost
                 while (true)
                 {
                     Console.Write("> ");
+                    (int initCX, int initCY) = (Console.CursorLeft, Console.CursorTop);
                     do
                     {
                         var key = Console.ReadKey(true);
@@ -39,8 +41,22 @@ namespace TurtlePost
                         else if (!char.IsControl(key.KeyChar))
                         {
                             Console.Write(key.KeyChar);
-                            CurrentInput.Append(key.KeyChar);
+                            if (CaretPosition == CurrentInput.Length)
+                            {
+                                CurrentInput.Append(key.KeyChar);
+                                CaretPosition++;
+                            }
+                            else
+                            {
+                                CurrentInput.Insert(CaretPosition, key.KeyChar);
+                                CaretPosition++;
+                            }
                         }
+                        (int oldCX, int oldCY) = (Console.CursorLeft, Console.CursorTop);
+                        Console.SetCursorPosition(initCX, initCY);
+                        Console.Write(CurrentInput+" ");
+                        Console.SetCursorPosition(oldCX, oldCY);
+                        Debug.WriteLine(CurrentInput.ToString());
                     } while (!InputComplete);
 
                     CurrentInput.Clear();

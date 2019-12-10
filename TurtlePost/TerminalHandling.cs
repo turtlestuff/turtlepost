@@ -24,7 +24,8 @@ namespace TurtlePost
 
         static Interpreter DirectInterpreter = default!;
         static bool InputComplete;
-        static StringBuilder CurrentInput = new StringBuilder(256);
+        static StringBuilder CurrentInput = new StringBuilder(256); 
+        static int CaretPosition = 0;
 
         static ImmutableDictionary<KeyPressed, KeyResponse> Keys = new Dictionary<KeyPressed, KeyResponse>
         {
@@ -51,7 +52,7 @@ namespace TurtlePost
                     Console.WriteLine();
                     if (CurrentInput.Length != 0) 
                         DirectInterpreter.Interpret(CurrentInput.ToString(), ref d);
-                    
+                    CaretPosition = 0;
                     InputComplete = true;
                 }
             },
@@ -66,8 +67,9 @@ namespace TurtlePost
                     else
                     {
                         //Back up the caret and replace it with a space
-                        Console.Write("\b \b");
-                        CurrentInput = CurrentInput.Remove(CurrentInput.Length - 1, 1);
+                        Console.Write('\b');
+                        CaretPosition--;
+                        CurrentInput = CurrentInput.Remove(CaretPosition, 1);
                     }
                 }
             },
@@ -84,6 +86,38 @@ namespace TurtlePost
 
                     InputComplete = true;
                 }
+            },
+            {
+                new KeyPressed(ConsoleKey.LeftArrow, 0), (ref Diagnostic _) =>
+                {
+                    if (CurrentInput.Length == 0)
+                    {
+                        //Nothing has been typed
+                        Console.Beep();
+                    }
+                    else
+                    {
+                        //Back up the caret
+                        Console.Write('\b');
+                        CaretPosition--;
+                    }
+                } 
+            },
+            {
+                new KeyPressed(ConsoleKey.RightArrow, 0), (ref Diagnostic _) =>
+                {
+                    if (CaretPosition == CurrentInput.Length)
+                    {
+                        //We're already at the end!
+                        Console.Beep();
+                    }
+                    else
+                    {
+                        //Advance the caret(Doesn't matter we're erasing a character, we'll write it all again anyway.)
+                        Console.Write(' ');
+                        CaretPosition++;
+                    }
+                } 
             }
         }.ToImmutableDictionary();
     }
