@@ -32,6 +32,7 @@ namespace TurtlePost
                     (int initCX, int initCY) = (Console.CursorLeft, Console.CursorTop);
                     do
                     {
+                        var oldLen = currentInput.Length;
                         var key = Console.ReadKey(true);
                         var keyPressed = new KeyPressed(key.Key, key.Modifiers);
                         if (Keys.TryGetValue(keyPressed, out var func))
@@ -54,6 +55,8 @@ namespace TurtlePost
                             }
                         }
                         (int oldCX, int oldCY) = (Console.CursorLeft, Console.CursorTop);
+                        Console.SetCursorPosition(initCX,initCY);
+                        Console.Write(new string(' ', oldLen));
                         Console.SetCursorPosition(initCX, initCY);
                         Console.Write(currentInput+" ");
                         Console.SetCursorPosition(oldCX, oldCY);
