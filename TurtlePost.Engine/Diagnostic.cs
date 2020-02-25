@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TurtlePost
 {
@@ -8,6 +9,7 @@ namespace TurtlePost
     /// <remarks>
     /// Diagnostics are often passed by <see langword="ref"/> to other methods in order for them to 'bubble up' throughout the interpretation of a script.
     /// </remarks>
+    [SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "Not an expected scenario")]
     public ref struct Diagnostic
     {
         internal static Diagnostic Translate(string id, DiagnosticType type, ReadOnlySpan<char> span, int? sourceLocation = null) =>
@@ -40,27 +42,27 @@ namespace TurtlePost
         /// <summary>
         /// The user facing message of the emitted diagnostic.
         /// </summary>
-        public string Message;
+        public string Message { get; set; }
 
         /// <summary>
         /// The ID of the emitted diagnostic.
         /// </summary>
-        public string Id;
+        public string Id { get; set; }
 
         /// <summary>
         /// The type of the emitted diagnostic.
         /// </summary>
-        public DiagnosticType Type;
+        public DiagnosticType Type { get; set; }
 
         /// <summary>
         /// The span of text which the emitted diagnostic was generated from.
         /// </summary>
-        public ReadOnlySpan<char> Span;
+        public ReadOnlySpan<char> Span { get; set; }
 
         /// <summary>
         /// The source location
         /// </summary>
-        public int? SourceLocation;
+        public int? SourceLocation { get; set; }
     }
     
     /// <summary>

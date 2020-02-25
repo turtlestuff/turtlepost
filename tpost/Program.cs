@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using static TurtlePost.I18N;
@@ -28,7 +27,7 @@ namespace TurtlePost
 
                 while (true)
                 {
-                    Console.Write("> ");
+                    Console.Write(">>> ");
                     (int initCX, int initCY) = (Console.CursorLeft, Console.CursorTop);
                     do
                     {
@@ -73,7 +72,7 @@ namespace TurtlePost
             {
                 // Load file
                 var code = File.ReadAllText(args[0]);
-                new Interpreter().Interpret(code, ref d, new Interpreter.InterpretationOptions { HideStack = true });
+                new Interpreter().Interpret(code, ref d, new InterpretationOptions { HideStack = true });
                 Console.WriteLine();
                 Console.WriteLine(TR["exit"]);
                 Console.ReadKey();

@@ -32,7 +32,7 @@ namespace TurtlePost
                     if (resources.Contains(res))
                     {
                         // We've found a translation file for the current culture; parse the JSON
-                        var translations = JsonDocument.Parse(
+                        using var translations = JsonDocument.Parse(
                             assembly.GetManifestResourceStream(res),
                             new JsonDocumentOptions {CommentHandling = JsonCommentHandling.Skip});
 
@@ -47,10 +47,14 @@ namespace TurtlePost
                         }
                     }
                 }
+#pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
                     Console.WriteLine("Error reading translation file {0}: {1}", culture, ex);
+#pragma warning restore CA1303 // Do not pass literals as localized parameters
                     Console.ResetColor();
                 }
                 
@@ -80,7 +84,7 @@ namespace TurtlePost
         /// <param name="key">The key to find a translation for.</param>
         /// <param name="values">The values to format the translation with.</param>
         public string this[string key, params object[] values] =>
-            localizations.ContainsKey(key) ? string.Format(localizations[key], values) : key;
+            localizations.ContainsKey(key) ? string.Format(CultureInfo.CurrentCulture, localizations[key], values) : key;
 
         readonly ImmutableDictionary<string, string> localizations;
     }

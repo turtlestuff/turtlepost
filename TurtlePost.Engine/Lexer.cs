@@ -1,7 +1,5 @@
 using System;
-using System.Buffers;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Text;
 using TurtlePost.Operations;
 
@@ -62,7 +60,7 @@ namespace TurtlePost
             // Likewise, if there is only whitespace after the first brace, we know the list is empty.
             if (buffer.Length > 1 && !buffer[1..].IsWhiteSpace())
                 new Interpreter(Operations, list).Interpret(buffer[1..].ToString(), ref d,
-                    new InterpretationOptions {DisallowOperations = true, HideDiagnostics = true, HideStack = true});
+                    new InterpretationOptions { DisallowOperations = true, HideDiagnostics = true, HideStack = true });
 
             UserStack.Push(list);
         }
@@ -72,38 +70,36 @@ namespace TurtlePost
             var buffer = ReadToNextDelimiter(out _);
             
             // We need to check for constants in here since these can't really be special cased.
-            switch (buffer)
+
+            if (buffer.Equals("true", StringComparison.Ordinal))
+                UserStack.Push(true);
+            else if (buffer.Equals("false", StringComparison.Ordinal))
+                UserStack.Push(false);
+            else if (buffer.Equals("null", StringComparison.Ordinal))
+                UserStack.Push(null);
+            else if (buffer.Equals("PI", StringComparison.Ordinal))
+                UserStack.Push(Math.PI);
+            else if (buffer.Equals("E", StringComparison.Ordinal))
+                UserStack.Push(Math.E);
+            else
             {
-                case var _ when buffer.Equals("true", StringComparison.Ordinal):
-                    UserStack.Push(true);
+                // If operations aren't allowed, error. We can't do this earlier since constants are checked in this method as well.
+                if (!allowOperations)
+                {
+                    d = Diagnostic.Translate("TP0012", DiagnosticType.Error, buffer);
                     return null;
-                case var _ when buffer.Equals("false", StringComparison.Ordinal):
-                    UserStack.Push(false);
-                    return null;
-                case var _ when buffer.Equals("null", StringComparison.Ordinal):
-                    UserStack.Push(null);
-                    return null;
-                case var _ when buffer.Equals("PI", StringComparison.Ordinal):
-                    UserStack.Push(Math.PI);
-                    return null;
-                case var _ when buffer.Equals("E", StringComparison.Ordinal):
-                    UserStack.Push(Math.E);
-                    return null;
-                default:
-                    // If operations aren't allowed, error. We can't do this earlier since constants are checked in this method as well.
-                    if (!allowOperations)
-                    {
-                        d = Diagnostic.Translate("TP0012", DiagnosticType.Error, buffer);
-                        return null;
-                    }
+                }
 
-                    if (!Operations.TryGetValue(buffer.ToString(), out var op))
-                    {
-                        d = Diagnostic.Translate("TP0004", DiagnosticType.Error, buffer);
-                    }
+                if (!Operations.TryGetValue(buffer.ToString(), out var op))
+                {
+                    d = Diagnostic.Translate("TP0004", DiagnosticType.Error, buffer);
+                }
 
-                    return op;
+                return op;
             }
+
+            return null;
+
         }
 
         void LexString(ref Diagnostic d)
@@ -111,14 +107,14 @@ namespace TurtlePost
             // This function shifts a sub-slice of the buffer to the left a specified amount of times. The sub-slice starts at the given start index and
             // continues to the end (we don't need anything more).
             // The goal is to overwrite some leftover data after we collapse the escape sequence into 1 (or 2) chars. It does this in a few steps:
-            // - It takes a slice of the buffer from the given starting index to the end
-            // - It subtracts our shift amount from the start index, giving us the index we intend to start writing to
-            // - It uses CopyTo to actually write the sub-slice into the original buffer
-            // - It slices off leftover data from the end; since we shifted over 'amount' times, there will be 'amount' indices of "garbage data" left over on
-            // the end of the buffer that we need to remove.
             static void ShiftBufferSegment(ref Span<char> buffer, int startIndex, int amount)
             {
+                // Take a slice of the buffer from the given starting index to the end and subtract our shift amount from the start index,
+                // giving us the index we intend to start writing to. Then, use CopyTo to actually write the sub-slice into the original buffer.
                 buffer[startIndex..].CopyTo(buffer[(startIndex - amount)..]);
+
+                // Slice off leftover data from the end; since we shifted over 'amount' times, there will be 'amount' indices of "garbage data" left
+                // over on the end of the buffer that we need to remove.
                 buffer = buffer[..^amount];
             }
 
@@ -129,17 +125,14 @@ namespace TurtlePost
             // (strings are immutable), we will need to make our own temporary mutable buffer. It needs to be as long as the source string, but when we collapse
             // the escape sequences, the string becomes shorter, so we will have to trim off the leftover space as we go.
 
-            // Allocate our buffer. If the string is too big for the stack, use the array pool.
-            char[]? rentedArr = default;
-            var buffer = sourceString.Length > 256
-                ? rentedArr = ArrayPool<char>.Shared.Rent(sourceString.Length)
-                : stackalloc char[sourceString.Length];
+            // Allocate our buffer. If the string is too big for the stack, allocate a new array.
+            var buffer = sourceString.Length > 512 ? new char[sourceString.Length] : stackalloc char[sourceString.Length];
 
             // Now we can copy from the source input to our mutable buffer
             sourceString.CopyTo(buffer);
 
             // Loop through our buffer to find any escape sequences
-            for (int i = 0; i < buffer.Length; i++)
+            for (var i = 0; i < buffer.Length; i++)
             {
                 if (buffer[i] != '\\')
                     continue;
@@ -147,49 +140,25 @@ namespace TurtlePost
                 // An escape sequence has started; look ahead to see what is actually being escaped
                 switch (buffer[i + 1])
                 {
-                    case '\'':
-                        buffer[i] = '\'';
-                        break;
-                    case '"':
-                        buffer[i] = '"';
-                        break;
-                    case '\\':
-                        buffer[i] = '\\';
-                        break;
-                    case '0':
-                        buffer[i] = '\0';
-                        break;
-                    case 'a':
-                        buffer[i] = '\a';
-                        break;
-                    case 'b':
-                        buffer[i] = '\b';
-                        break;
-                    case 'f':
-                        buffer[i] = '\f';
-                        break;
-                    case 'n':
-                        buffer[i] = '\n';
-                        break;
-                    case 'r':
-                        buffer[i] = '\r';
-                        break;
-                    case 't':
-                        buffer[i] = '\t';
-                        break;
-                    case 'v':
-                        buffer[i] = '\v';
-                        break;
+                    case '"': buffer[i] = '"'; break;
+                    case '0': buffer[i] = '\0'; break;
+                    case 'a': buffer[i] = '\a'; break;
+                    case 'b': buffer[i] = '\b'; break;
+                    case 'f': buffer[i] = '\f'; break;
+                    case 'n': buffer[i] = '\n'; break;
+                    case 'r': buffer[i] = '\r'; break;
+                    case 't': buffer[i] = '\t'; break;
+                    case 'v': buffer[i] = '\v'; break;
+                    case '\'': buffer[i] = '\''; break;
+                    case '\\': buffer[i] = '\\'; break;
                     case 'u':
                         // 'u' denotes an escape of the form \uXXXX, where XXXX is a UTF-16 code unit in hex. We need to capture those 4 characters that make up
                         // the hex digit, parse it, and reinterpret it as  a character. 
-                        if (!ushort.TryParse(buffer[(i + 2)..(i + 6)], NumberStyles.HexNumber,
-                            CultureInfo.InvariantCulture, out var utf16CodeUnit))
+                        if (!ushort.TryParse(buffer.Slice(i + 2, 4), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var utf16CodeUnit))
                         {
                             d = Diagnostic.Translate("TP0008", DiagnosticType.Error, sourceString, i + 2);
-                            if (rentedArr != null)
-                                ArrayPool<char>.Shared.Return(rentedArr);
                             return;
+
                         }
 
                         buffer[i] = (char) utf16CodeUnit;
@@ -202,36 +171,23 @@ namespace TurtlePost
                         // 'U' is similar in form to 'u', but parses a UTF-32 code unit instead (with an 8 digit long hex string to match). Because a UTF-32
                         // code unit may or may not correspond to a UTF-16 surrogate pair, we will have to shift either 8 or 9 characters over, depending on how
                         // many UTF-16 code units we end up writing.
-                        if (!uint.TryParse(buffer[(i + 2)..(i + 10)], NumberStyles.HexNumber,
-                            CultureInfo.InvariantCulture, out var utf32CodeUnit))
+                        if (!uint.TryParse(buffer.Slice(i + 2, 8), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var utf32CodeUnit))
                         {
                             d = Diagnostic.Translate("TP0008", DiagnosticType.Error, sourceString, i + 2);
-                            if (rentedArr != null)
-                                ArrayPool<char>.Shared.Return(rentedArr);
                             return;
                         }
 
-                        // We will use Encoding to convert a UTF-32 code unit to UTF-16 code units and write it to the buffer, starting from the current index
-                        // (which is the backslash).
-                        ReadOnlySpan<byte> bytes;
-                        unsafe
-                        {
-                            // Encoding wants a ReadOnlySpan<byte> to represent our input, so we need to convert our UInt32 to bytes. We can just reinterpret it
-                            // as a 4 byte span.
-                            bytes = new ReadOnlySpan<byte>(Unsafe.AsPointer(ref utf32CodeUnit), sizeof(uint));
-                        }
-
-                        // We need to store the amount of characters written so that we trim off the correct number of garbage characters; if we write more than
-                        // 1 character, we need to account for that (or else it gets discarded and the wrong character sequence is written).
-                        var charsWritten = Encoding.UTF32.GetChars(bytes, buffer);
+                        // We will use Rune to convert a UTF-32 code unit to UTF-16 code units and write it to the buffer, starting from the current index
+                        // (which is the backslash). We need to store the amount of characters written so that we trim off the correct number of garbage
+                        // characters; if we write more than 1 character, we need to account for that (or else it gets discarded and the wrong character
+                        // sequence is written).
+                        var charsWritten = new Rune(utf32CodeUnit).EncodeToUtf16(buffer[i..]);
 
                         // Since charsWritten is always 1 or 2, we can subtract it from 10 to see how many garbage characters we have to trim.
                         ShiftBufferSegment(ref buffer, i + 10, 10 - charsWritten);
                         continue;
                     default:
                         d = Diagnostic.Translate("TP0009", DiagnosticType.Error, sourceString);
-                        if (rentedArr != null)
-                            ArrayPool<char>.Shared.Return(rentedArr);
                         return;
                 }
 
@@ -248,12 +204,7 @@ namespace TurtlePost
                 ShiftBufferSegment(ref buffer, i + 2, 1);
             }
 
-            // Make sure we return our array to the array pool if we used one
-            if (rentedArr != null)
-                ArrayPool<char>.Shared.Return(rentedArr);
-
-            // Finally push our escaped string to the stack.
-            // And it was done allocation-free :)
+            // Finally push our escaped string to the stack
             UserStack.Push(buffer.ToString());
         }
 

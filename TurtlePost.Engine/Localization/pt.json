@@ -16,7 +16,6 @@
     "labels": "Etiquetas:",
     "globals": "Globais:",
 
-
     "TP0001": "Não pôde retirar valor; stack do usuário está vazia.",
     "TP0002": "Não pôde retornar; stack de chamadas está vazia.",
     "TP0003": "Tentou retirar valor de tipo '{0}', retirou-se tipo '{1}'.",

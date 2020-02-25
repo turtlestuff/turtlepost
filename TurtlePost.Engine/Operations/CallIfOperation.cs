@@ -16,7 +16,8 @@
             if (cond)
             {
                 interpreter.CallStack.Push(interpreter.Enumerator.Position);
-                interpreter.Enumerator.Position = label.Position - 1;
+                ref var i = ref interpreter.Enumerator;
+                i.Position = label.Position - 1;
             }
         }
     }

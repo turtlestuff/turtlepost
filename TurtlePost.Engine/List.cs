@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -9,24 +10,24 @@ namespace TurtlePost
     /// <summary>
     /// A list-stack hybrid. This collection can be indexed and pushed to/popped from.
     /// </summary>
+    [SuppressMessage("Naming", "CA1710:Identifiers should have correct suffix", Justification = "Not a collection")]
     public class List : IEnumerable<object?>
     {
         Stack<object?> stack;
         
         // These methods are used to get the internal state of the stack that is used as the backing collection.
-        // Since the names and usages of these fields are guaranteed not to change to preserve binary serialization compatibility, this is safe.
         
         static readonly Func<Stack<object?>, object?[]> GetStackArray =
             Utils.GetFieldDelegate<Stack<object?>, object?[]>(typeof(Stack<object?>)
-                .GetField("_array", BindingFlags.Instance | BindingFlags.NonPublic));
+                .GetField("_array", BindingFlags.Instance | BindingFlags.NonPublic)!);
         
         static readonly Func<Stack<object?>, int> GetStackSize =
             Utils.GetFieldDelegate<Stack<object?>, int>(typeof(Stack<object?>)
-                .GetField("_size", BindingFlags.Instance | BindingFlags.NonPublic));
+                .GetField("_size", BindingFlags.Instance | BindingFlags.NonPublic)!);
         
         static readonly Action<Stack<object?>, int> SetStackSize =
             Utils.SetFieldDelegate<Stack<object?>, int>(typeof(Stack<object?>)
-                .GetField("_size", BindingFlags.Instance | BindingFlags.NonPublic));
+                .GetField("_size", BindingFlags.Instance | BindingFlags.NonPublic)!);
 
         
         /// <summary>
@@ -126,8 +127,8 @@ namespace TurtlePost
         /// <summary>
         /// Inserts an object at the top of the <see cref="List"/>.
         /// </summary>
-        /// <param name="obj">The object to insert.</param>
-        public void Push(object? obj) => stack.Push(obj);
+        /// <param name="value">The object to insert.</param>
+        public void Push(object? value) => stack.Push(value);
         /// <summary>
         /// Clears the collection.
         /// </summary>
@@ -135,9 +136,9 @@ namespace TurtlePost
         /// <summary>
         /// Attempts to remove and return the object at the top of the <see cref="List"/>.
         /// </summary>
-        /// <param name="obj">The resulting object.</param>
+        /// <param name="value">The resulting object.</param>
         /// <returns>A value indicating whether the object was popped successfully.</returns>
-        public bool TryPop(out object? obj) => stack.TryPop(out obj);
+        public bool TryPop(out object? value) => stack.TryPop(out value);
 
         /// <summary>
         /// Enumerates the elements of a <see cref="List"/> object.

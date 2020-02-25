@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace TurtlePost
 {
     /// <summary>
@@ -6,6 +8,7 @@ namespace TurtlePost
     /// <remarks>
     /// Globals are referenced using the <code>&amp;var</code> syntax. The <see cref="GlobalBag"/> stores and creates globals as they are used.
     /// </remarks>
+    [SuppressMessage("Naming", "CA1716:Identifiers should not match keywords", Justification = "No")]
     public class Global
     {
         /// <summary>

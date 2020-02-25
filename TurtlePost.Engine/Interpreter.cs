@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using TurtlePost.Operations;
 using static TurtlePost.I18N;
 using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
+using System.Globalization;
 
 namespace TurtlePost
 {
@@ -106,11 +106,13 @@ namespace TurtlePost
                 { "copying", CopyingOperation.Instance },
             };
         }
-        
+
         /// <summary>
         /// An enumerator.
         /// </summary>
-        public MovableStringEnumerator Enumerator { get; private set; } = default!;
+        public ref MovableStringEnumerator Enumerator => ref _enumerator;
+
+        MovableStringEnumerator _enumerator;
         
         /// <summary>
         /// The code being currently interpreted.
@@ -140,7 +142,7 @@ namespace TurtlePost
         /// <summary>
         /// Gets the operations that this interpreter can use.
         /// </summary>
-        public Dictionary<string, Operation> Operations { get; set; }
+        public Dictionary<string, Operation> Operations { get; }
 
         static readonly Regex LabelRegex = new Regex(@"@(\w)*:", RegexOptions.Compiled);
 
@@ -152,10 +154,9 @@ namespace TurtlePost
                     if (!options.HideDiagnostics)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.Write("{0} {1}: {2} ['", TR["error"], d.Id, d.Message);
+                        Console.Write($"{TR["error"]} {d.Id}: {d.Message} ['");
                         Console.Out.Write(d.Span);
-                        Console.WriteLine("', {0} {1}]", TR["pos"],
-                            (d.SourceLocation ?? Enumerator.Position - d.Span.Length).ToString());
+                        Console.WriteLine($"', {TR["pos"]} {d.SourceLocation ?? Enumerator.Position - d.Span.Length}]");
                         Console.ResetColor();
                     }
                     UserStack.Clear();
@@ -163,25 +164,6 @@ namespace TurtlePost
                 default:
                     return false;
             }
-        }
-
-        /// <summary>
-        /// A structure that represents options to pass to the interpreter.
-        /// </summary>
-        public struct InterpretationOptions
-        {
-            /// <summary>
-            /// Gets or sets whether the <see cref="Interpreter.UserStack"/> should be printed to the console.
-            /// </summary>
-            public bool HideStack { get; set; }
-            /// <summary>
-            /// Gets or sets whether operations should be allowed to be parsed.
-            /// </summary>
-            public bool DisallowOperations { get; set; }
-            /// <summary>
-            /// Gets or sets whether diagnostics should be printed to the console.
-            /// </summary>
-            public bool HideDiagnostics { get; set; }
         }
         
         /// <summary>
@@ -192,6 +174,8 @@ namespace TurtlePost
         /// <param name="options">The options to give to the interpreter</param>
         public void Interpret(string code, ref Diagnostic diagnostic, InterpretationOptions options = default)
         {
+            if (code is null)
+                throw new ArgumentNullException(nameof(code));
 #if DEBUG
             Stopwatch sw = default!;
             if (!options.HideStack) 
@@ -241,7 +225,9 @@ namespace TurtlePost
                     }
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine(TR["internalError"], ex);
@@ -257,7 +243,7 @@ namespace TurtlePost
                 sw.Stop();
                 Utils.PrintGlobals(Globals);
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(TR["executionTime"], sw.Elapsed.TotalMilliseconds.ToString());
+                Console.WriteLine(TR["executionTime"], sw.Elapsed.TotalMilliseconds.ToString(CultureInfo.CurrentCulture));
                 Console.ResetColor();
 #endif
                 Utils.PrintStack(UserStack);

@@ -22,6 +22,9 @@
         /// <inheritdoc />
         public sealed override void Operate(Interpreter interpreter, ref Diagnostic diagnostic)
         {
+            if (interpreter is null)
+                throw new System.ArgumentNullException(nameof(interpreter));
+
             if (!interpreter.TryPopA<TValue>(ref diagnostic, out var value)) return;
 
             interpreter.UserStack.Push(Operate(value, interpreter, ref diagnostic));

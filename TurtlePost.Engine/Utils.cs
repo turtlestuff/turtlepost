@@ -5,9 +5,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using LabelBag = System.Collections.Generic.Dictionary<string, TurtlePost.Label>;
 using static TurtlePost.I18N;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace TurtlePost
 {
+    [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Only writing symbols")]
     static class Utils
     {
         
@@ -41,7 +44,7 @@ namespace TurtlePost
                 Console.Write(TR["labels"]);
                 Console.Write(" ");
                 Console.WriteLine(string.Join(" | ", 
-                    labels.Select(p => $"@{p.Key} -> {p.Value.Position.ToString()}")));
+                    labels.Select(p => $"@{p.Key} -> {p.Value.Position}")));
                 Console.ResetColor();
             }
         }
@@ -93,7 +96,7 @@ namespace TurtlePost
                     break;
                 case bool b:
                     Console.ForegroundColor = ConsoleColor.DarkBlue;
-                    Console.Write(b.ToString().ToLower());
+                    Console.Write(b ? "true" : "false");
                     break;
                 case null:
                     Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -121,11 +124,12 @@ namespace TurtlePost
             }
         }
 
+        [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Used for presentation purposes")]
         public static string GetTypeName(Type? type)
         {
             if (type == typeof(double)) return "number";
             if (type == typeof(Stack<object?>)) return "list";
-            return type?.Name.ToLower() ?? "null";
+            return type?.Name.ToLowerInvariant() ?? "null";
         }
     }
 }

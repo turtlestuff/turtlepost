@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using static TurtlePost.I18N;
 
 namespace TurtlePost.Operations
@@ -17,6 +18,9 @@ namespace TurtlePost.Operations
         /// <returns>A value indicating if the value was returned successfully.</returns>
         public static bool GetAt(this List stack, int index, ref Diagnostic d, out object? value)
         {
+            if (stack is null)
+                throw new System.ArgumentNullException(nameof(stack));
+
             if (!stack.TryGetElement(index, out value))
             {
                 d = new Diagnostic(TR["TP0013", index], "TP0013", DiagnosticType.Error, d.Span);
@@ -36,6 +40,9 @@ namespace TurtlePost.Operations
         /// <returns>A value indicating if the value was set successfully.</returns>
         public static bool SetAt(this List stack, int index, ref Diagnostic d, object? value)
         {
+            if (stack is null)
+                throw new System.ArgumentNullException(nameof(stack));
+
             if (!stack.TrySetElement(index, value))
             {
                 d = new Diagnostic(TR["TP0013", index], "TP0013", DiagnosticType.Error, d.Span);
@@ -54,6 +61,9 @@ namespace TurtlePost.Operations
         /// <returns>A value indicating if the value was removed successfully.</returns>
         public static bool RemoveAt(this List stack, int index, ref Diagnostic d)
         {
+            if (stack is null)
+                throw new System.ArgumentNullException(nameof(stack));
+
             if (!stack.TryRemoveElement(index))
             {
                 d = new Diagnostic(TR["TP0013", index], "TP0013", DiagnosticType.Error, d.Span);
@@ -70,8 +80,14 @@ namespace TurtlePost.Operations
         /// <param name="d">A diagnostic which will contain information about any errors.</param>
         /// <param name="value">The popped value, if any.</param>
         /// <returns>A value indicating whether the object was popped successfully.</returns>
-        public static bool TryPopA<T>(this Interpreter interpreter, ref Diagnostic d, out T value) => interpreter.UserStack.TryPopA(ref d, out value);
-        
+        public static bool TryPopA<T>(this Interpreter interpreter, ref Diagnostic d, out T value)
+        {
+            if (interpreter is null)
+                throw new System.ArgumentNullException(nameof(interpreter));
+
+            return interpreter.UserStack.TryPopA(ref d, out value);
+        }
+
         /// <summary>
         /// Attempts to pop an item of the specified type <typeparamref name="T"/>. If <typeparam name="T" /> is <see cref="object"/>, it will pop any object, including null. 
         /// </summary>
@@ -79,8 +95,11 @@ namespace TurtlePost.Operations
         /// <param name="d">A diagnostic which will contain information about any errors.</param>
         /// <param name="value">The popped value, if any.</param>
         /// <returns>A value indicating whether the object was popped successfully.</returns>
-        public static bool TryPopA<T>(this List stack, ref Diagnostic d, out T value) // TODO: MaybeNullAttribute
+        public static bool TryPopA<T>(this List stack, ref Diagnostic d, [MaybeNullWhen(false)] out T value)
         {
+            if (stack is null)
+                throw new System.ArgumentNullException(nameof(stack));
+
             if (!stack.TryPop(out var obj))
             {
                 d = Diagnostic.Translate("TP0001", DiagnosticType.Error, d.Span);
@@ -111,6 +130,9 @@ namespace TurtlePost.Operations
         /// <returns>A value indicating whether the stack frame was popped successfully.</returns>
         public static bool TryPopStackFrame(this Interpreter interpreter, ref Diagnostic d, out int position)
         {
+            if (interpreter is null)
+                throw new System.ArgumentNullException(nameof(interpreter));
+
             if (interpreter.CallStack.TryPop(out position)) return true;
             
             d = Diagnostic.Translate("TP0002", DiagnosticType.Error, d.Span);
